@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, ChevronDown, CheckCircle2, RotateCw } from "lucide-react";
 import { Card, Badge, Button, Eyebrow } from "@/components/studymind/primitives";
 import { questions, subjects } from "@/data/mock";
 import { cn } from "@/lib/utils";
+import { cogneeGetQuestions } from "@/lib/cognee";
+import { Markdown } from "@/components/studymind/Markdown";
 
 export const Route = createFileRoute("/question-bank")({
   head: () => ({
@@ -15,28 +17,85 @@ export const Route = createFileRoute("/question-bank")({
   component: QuestionBankPage,
 });
 
+interface ChatThread {
+  id: string;
+  title: string;
+  datasetName: string;
+  searchType: string;
+  messages: any[];
+  updatedAt: string;
+}
+
 function QuestionBankPage() {
+  const [questionsList, setQuestionsList] = useState<any[]>(questions);
   const [subject, setSubject] = useState("All");
   const [source, setSource] = useState("All");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadQuestions = () => {
+      setLoading(true);
+      try {
+        const savedThreads = localStorage.getItem("studymind_chat_threads");
+        let localQs: any[] = [];
+        if (savedThreads) {
+          const threads: ChatThread[] = JSON.parse(savedThreads);
+          threads.forEach((t) => {
+            // Traverse messages to extract Q&A pairs
+            for (let i = 0; i < t.messages.length; i++) {
+              const msg = t.messages[i];
+              if (msg.role === "user") {
+                const nextMsg = t.messages[i + 1];
+                if (nextMsg && nextMsg.role === "ai") {
+                  localQs.push({
+                    id: `${t.id}-${i}`,
+                    question: msg.text,
+                    answer: nextMsg.summary || nextMsg.text,
+                    subject: t.datasetName,
+                    chapter: t.searchType.toLowerCase().replace(/_/g, " "),
+                    source: "Study Workspace",
+                    verified: !!nextMsg.verified,
+                    reused: 1,
+                  });
+                }
+              }
+            }
+          });
+        }
+
+        if (localQs.length > 0) {
+          setQuestionsList(localQs);
+        } else {
+          setQuestionsList(questions);
+        }
+      } catch (err) {
+        console.error("Failed to load questions from threads:", err);
+        setQuestionsList(questions);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadQuestions();
+  }, []);
 
   const filtered = useMemo(() => {
-    return questions.filter((q) => {
+    return questionsList.filter((q) => {
       if (subject !== "All" && q.subject !== subject) return false;
       if (source !== "All" && q.source !== source) return false;
       if (verifiedOnly && !q.verified) return false;
       if (search && !q.question.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [subject, source, verifiedOnly, search]);
+  }, [questionsList, subject, source, verifiedOnly, search]);
 
   return (
     <main className="mx-auto max-w-7xl px-5 sm:px-8 py-10 md:py-14">
       <header className="mb-8">
         <Eyebrow>Question Bank</Eyebrow>
         <h1 className="text-3xl md:text-5xl font-semibold tracking-tight">Your library of questions</h1>
-        <p className="text-[color:var(--link)] mt-2 text-[14px] max-w-xl">Everything you've ever asked, generated, or pulled from past papers — cited and searchable.</p>
+        <p className="text-[color:var(--link)] mt-2 text-[14px] max-w-xl">Everything you've ever asked, generated, or pulled from past papers — cited and searchable. {loading && <span className="text-[10px] uppercase ml-2 text-primary animate-pulse">(Syncing...)</span>}</p>
       </header>
 
       <div className="soft-card p-4 mb-6 flex flex-col md:flex-row gap-3">
@@ -95,7 +154,9 @@ function QCard({ q }: { q: typeof questions[number] }) {
         {open ? "Hide answer" : "Show answer"} {open ? "↑" : "↓"}
       </button>
       {open && (
-        <div className="mt-3 pt-3 border-t border-white/5 text-[13px] text-[color:var(--link)] leading-relaxed whitespace-pre-wrap">{q.answer}</div>
+        <div className="mt-3 pt-3 border-t border-white/5 text-[13px] text-[color:var(--link)] leading-relaxed">
+          <Markdown text={q.answer} />
+        </div>
       )}
     </Card>
   );
