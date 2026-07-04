@@ -1,15 +1,51 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowRight, Sparkles, Check, ChevronDown, Brain, Zap, Target, Upload, MessageSquare, LineChart, BookMarked, Flame, Network, ListChecks, Layers } from "lucide-react";
-import { Button, Card, Badge, SectionHeading, Reveal, Eyebrow } from "@/components/studymind/primitives";
-import { testimonials, stats, pricing, faq, howItWorks, whyCards, featureChips, trustedLogos } from "@/data/mock";
+import { useState, useEffect } from "react";
+import {
+  ArrowRight,
+  Sparkles,
+  Check,
+  ChevronDown,
+  Brain,
+  Zap,
+  Target,
+  Upload,
+  MessageSquare,
+  LineChart,
+  BookMarked,
+  Flame,
+  Network,
+  ListChecks,
+  Layers,
+} from "lucide-react";
+import {
+  Button,
+  Card,
+  Badge,
+  SectionHeading,
+  Reveal,
+  Eyebrow,
+} from "@/components/studymind/primitives";
+import {
+  testimonials,
+  stats,
+  pricing,
+  faq,
+  howItWorks,
+  whyCards,
+  featureChips,
+  trustedLogos,
+} from "@/data/mock";
 import memoPreview from "@/assets/memo-preview.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "StudyMind — Never Get a Different Answer Twice" },
-      { name: "description", content: "A persistent-memory AI study companion. Consistent, source-cited answers grounded in your own notes and past papers." },
+      { title: "Memoria — Never Get a Different Answer Twice" },
+      {
+        name: "description",
+        content:
+          "A persistent-memory AI study companion. Consistent, source-cited answers grounded in your own notes and past papers.",
+      },
     ],
   }),
   component: Home,
@@ -17,72 +53,188 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <main className="overflow-hidden">
-      <Hero />
-      <ValueStrip />
-      <Why />
-      <HowItWorks />
-      <Showcase />
-      <Testimonials />
-      <Stats />
-      <Pricing />
-      <FAQSection />
-      <FinalCTA />
+    <main className="bg-background min-h-screen">
+      <div className="mx-auto pt-24 pb-8">
+        <Hero />
+        <Marquee />
+        <ValueStrip />
+        <Why />
+        <HowItWorks />
+        <Showcase />
+        <Testimonials />
+        <Stats />
+        <Pricing />
+        <FAQSection />
+        <FinalCTA />
+      </div>
     </main>
+  );
+}
+
+function Marquee() {
+  const items = [
+    "AI STUDY COMPANION",
+    "•",
+    "KNOWLEDGE GRAPH",
+    "•",
+    "AUTOMATED REVISION",
+    "•",
+    "SMART FLASHCARDS",
+    "•",
+    "PDF CHAT",
+    "•",
+  ];
+  return (
+    <div className="w-full overflow-hidden bg-muted text-muted-foreground py-5 flex whitespace-nowrap border-y border-border">
+      <div className="animate-marquee flex gap-12 items-center font-medium tracking-[0.2em] text-[13px] uppercase">
+        {items.map((item, i) => (
+          <span key={i}>{item}</span>
+        ))}
+        {items.map((item, i) => (
+          <span key={i + 100}>{item}</span>
+        ))}
+        {items.map((item, i) => (
+          <span key={i + 200}>{item}</span>
+        ))}
+        {items.map((item, i) => (
+          <span key={i + 300}>{item}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FlowingLines() {
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none opacity-20 -z-10"
+      viewBox="0 0 1000 400"
+      preserveAspectRatio="none"
+    >
+      <path
+        d="M0 200 Q 250 50, 500 200 T 1000 200"
+        fill="none"
+        stroke="var(--color-primary)"
+        strokeWidth="4"
+        strokeDasharray="10 10"
+        className="animate-dash-flow"
+      />
+    </svg>
+  );
+}
+
+function NumberCounter({ end, suffix = "" }: { end: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const duration = 2000;
+    const stepTime = Math.max(16, Math.floor(duration / end));
+    const stepValue = Math.max(1, Math.floor(end / (duration / stepTime)));
+
+    const timer = setInterval(() => {
+      start += stepValue;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(start);
+      }
+    }, stepTime);
+    return () => clearInterval(timer);
+  }, [end]);
+  return (
+    <>
+      {count}
+      {suffix}
+    </>
   );
 }
 
 function Hero() {
   return (
-    <section className="relative pt-14 pb-20 md:pt-24 md:pb-32">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-primary/20 rounded-full blur-[160px]" />
-      </div>
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 text-center">
-        <Reveal>
-          <Badge variant="primary" className="mb-6 py-1.5 px-4">
-            <Brain className="w-3.5 h-3.5" /> Your memory-powered study companion
-          </Badge>
-        </Reveal>
-        <Reveal delay={100}>
-          <h1 className="text-[44px] leading-[1.02] sm:text-6xl md:text-7xl lg:text-[82px] font-semibold tracking-tight max-w-5xl mx-auto">
-            Never Get a<br />
-            <span className="italic font-light text-[color:var(--link)]">Different Answer</span> Twice
-          </h1>
-        </Reveal>
-        <Reveal delay={200}>
-          <p className="mt-7 text-base md:text-lg text-[color:var(--link)] max-w-2xl mx-auto leading-relaxed">
-            StudyMind remembers your notes, past papers, and mistakes — so every answer is consistent, source-cited, and truly yours.
-          </p>
-        </Reveal>
-        <Reveal delay={300}>
-          <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link to="/sign-up"><Button size="lg">Get Started Free <ArrowRight className="w-4 h-4" /></Button></Link>
-            <a href="#how"><Button size="lg" variant="outline">See How It Works</Button></a>
-          </div>
-        </Reveal>
+    <section className="relative px-5 sm:px-8 lg:px-16 pt-16 pb-24 md:pb-32 overflow-hidden max-w-7xl mx-auto">
+      <div className="flex flex-col lg:flex-row items-center gap-16">
+        {/* Left Side: Typography */}
+        <div className="flex-1 text-left relative z-10 w-full">
+          <Reveal>
+            <div className="text-xs font-semibold tracking-[0.2em] text-primary mb-8 uppercase">
+              [ Memoria ]
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <h1 className="text-6xl sm:text-7xl md:text-[90px] lg:text-[110px] leading-[0.95] font-serif font-medium tracking-wide text-foreground">
+              Never get <br />
+              a different <br />
+              <span className="italic text-primary">answer</span> twice.
+            </h1>
+          </Reveal>
+          <Reveal delay={200}>
+            <p className="mt-10 text-[17px] text-muted-foreground font-medium max-w-md leading-relaxed">
+              Memoria remembers your notes and mistakes, so every answer is
+              consistent, source-cited, and truly yours.
+            </p>
+          </Reveal>
+          <Reveal delay={300}>
+            <div className="mt-12 flex items-center gap-4">
+              <Link to="/sign-up">
+                <Button
+                  size="lg"
+                  className="shadow-lg hover:shadow-xl rounded-full text-[15px] px-10 h-14 bg-primary text-white font-medium hover:-translate-y-1 transition-all"
+                >
+                  Start Learning
+                </Button>
+              </Link>
+              <Link
+                to="#how"
+                className="text-[14px] font-medium text-foreground hover:text-primary transition-colors flex items-center gap-2"
+              >
+                Learn more <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </Reveal>
+        </div>
 
-        <Reveal delay={450}>
-          <div className="mt-20 relative">
-            <div className="absolute -inset-x-10 -inset-y-6 bg-gradient-to-b from-primary/20 to-transparent blur-3xl -z-10" />
-            <div className="soft-card p-2 md:p-3 mx-auto max-w-5xl overflow-hidden">
-              <div className="rounded-2xl overflow-hidden border border-white/5">
-                <img src={memoPreview.url} alt="StudyMind Memo chat interface" className="w-full aspect-[16/9] object-cover object-top" />
+        {/* Right Side: 3D Elements and Growth Card */}
+        <div className="flex-1 relative w-full h-[500px] lg:h-[700px] flex items-center justify-center">
+          <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl -z-10" />
+
+          <Reveal delay={300} className="absolute top-10 left-10">
+            <div className="w-32 h-32 bg-primary rounded-[2rem] shadow-xl rotate-12 flex items-center justify-center">
+              <Sparkles className="w-14 h-14 text-white" />
+            </div>
+          </Reveal>
+
+          <Reveal delay={400} className="absolute bottom-32 left-1/4">
+            <div className="w-24 h-24 bg-yellow-400 rounded-full shadow-lg -rotate-12 flex items-center justify-center">
+              <Brain className="w-12 h-12 text-black" />
+            </div>
+          </Reveal>
+
+          <Reveal delay={500} className="absolute top-1/4 right-0">
+            <div className="w-40 h-40 bg-red-500 rounded-[2.5rem] shadow-2xl rotate-6 flex items-center justify-center">
+              <Target className="w-16 h-16 text-white" />
+            </div>
+          </Reveal>
+
+          {/* Growth Card */}
+          <Reveal delay={600} className="absolute bottom-10 right-10 z-20">
+            <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2rem] shadow-sm border border-white w-80 hover:-translate-y-2 transition-transform duration-500">
+              <div className="flex items-center gap-3 mb-3">
+                <ArrowRight className="w-10 h-10 text-foreground -rotate-45" />
+                <span className="text-6xl font-normal tracking-tighter text-foreground">
+                  <NumberCounter end={132} suffix="%" />
+                </span>
               </div>
+              <div className="text-[14px] font-semibold tracking-widest text-foreground/60 mb-3 uppercase">
+                Retention
+              </div>
+              <p className="text-[13px] text-foreground/60 leading-relaxed font-medium">
+                Our students see measurable memory growth through strategic AI
+                revision.
+              </p>
             </div>
-          </div>
-        </Reveal>
-
-        <Reveal delay={600}>
-          <div className="mt-16">
-            <div className="eyebrow mb-6">Trusted by students at</div>
-            <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-4 opacity-50">
-              {trustedLogos.map((l) => (
-                <span key={l} className="text-lg md:text-xl font-semibold tracking-tight grayscale">{l}</span>
-              ))}
-            </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -90,17 +242,13 @@ function Hero() {
 
 function ValueStrip() {
   return (
-    <section className="py-20 md:py-28 relative">
+    <section className="py-24 md:py-32 relative bg-background border-b border-border">
       <div className="mx-auto max-w-4xl px-5 sm:px-8 text-center relative">
-        <div className="hidden md:block absolute -left-8 top-8 float-y">
-          <Card className="p-4 w-40"><Sparkles className="w-5 h-5 text-primary mb-2" /><div className="text-[11px] text-[color:var(--link)]">Grounded in your notes</div></Card>
-        </div>
-        <div className="hidden md:block absolute -right-8 bottom-0 float-y" style={{ animationDelay: "-3s" }}>
-          <Card className="p-4 w-40"><Target className="w-5 h-5 text-primary mb-2" /><div className="text-[11px] text-[color:var(--link)]">Remembers mistakes</div></Card>
-        </div>
         <Reveal>
-          <h2 className="text-3xl md:text-5xl font-semibold leading-tight tracking-tight">
-            Learning that <span className="text-[color:var(--link)]">remembers you</span>, instead of forgetting every session.
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-medium leading-[1.1] tracking-wide text-foreground">
+            Learning that{" "}
+            <span className="text-primary italic">remembers you</span>, instead
+            of forgetting every session.
           </h2>
         </Reveal>
       </div>
@@ -111,22 +259,35 @@ function ValueStrip() {
 function Why() {
   const icons = [Zap, BookMarked, Target];
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-24 md:py-32 bg-background">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal>
-          <SectionHeading eyebrow="Why StudyMind" title={<>What sets StudyMind <span className="text-[color:var(--link)] italic font-light">apart</span></>} center />
+          <SectionHeading
+            eyebrow="Why Memoria"
+            title={
+              <>
+                What sets Memoria{" "}
+                <span className="text-primary italic">apart</span>
+              </>
+            }
+            center
+          />
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-3 gap-8">
           {whyCards.map((c, i) => {
             const Icon = icons[i];
             return (
               <Reveal key={c.title} delay={i * 100}>
-                <Card className="h-full hover:-translate-y-1 hover:border-white/15">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/15 border border-primary/30 grid place-items-center mb-6">
-                    <Icon className="w-5 h-5 text-white" />
+                <Card className="h-full flex flex-col items-center text-center p-10 bg-white border border-[#E8E3DB] shadow-sm hover:shadow-md transition-all rounded-[2rem]">
+                  <div className="w-16 h-16 bg-[#FAF7F2] rounded-full grid place-items-center mb-6">
+                    <Icon className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">{c.title}</h3>
-                  <p className="text-[13px] text-[color:var(--link)] leading-relaxed">{c.desc}</p>
+                  <h3 className="text-2xl font-serif font-medium tracking-wide mb-4 text-foreground">
+                    {c.title}
+                  </h3>
+                  <p className="text-[15px] text-muted-foreground leading-relaxed max-w-xs">
+                    {c.desc}
+                  </p>
                 </Card>
               </Reveal>
             );
@@ -134,9 +295,14 @@ function Why() {
         </div>
 
         <Reveal delay={300}>
-          <div className="mt-10 flex flex-wrap justify-center gap-2">
+          <div className="mt-14 flex flex-wrap justify-center gap-3">
             {featureChips.map((chip) => (
-              <span key={chip} className="px-4 py-2 rounded-full border border-white/10 bg-white/[0.03] text-[12px] text-[color:var(--link)] hover:border-white/25 hover:text-foreground transition-colors">{chip}</span>
+              <span
+                key={chip}
+                className="px-5 py-2 rounded-full border border-border bg-white text-[14px] font-medium text-foreground shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default"
+              >
+                {chip}
+              </span>
             ))}
           </div>
         </Reveal>
@@ -147,18 +313,32 @@ function Why() {
 
 function HowItWorks() {
   return (
-    <section id="how" className="py-20 md:py-28">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+    <section
+      id="how"
+      className="py-24 md:py-32 bg-background relative overflow-hidden border-t border-border"
+    >
+      <FlowingLines />
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 relative z-10">
         <Reveal>
-          <SectionHeading eyebrow="How it works" title="Four steps from upload to mastery" center />
+          <SectionHeading
+            eyebrow="How it works"
+            title="Four steps to mastery"
+            center
+          />
         </Reveal>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {howItWorks.map((s, i) => (
             <Reveal key={s.n} delay={i * 100}>
-              <Card className="h-full">
-                <div className="text-primary text-[13px] font-semibold mb-4">{s.n}</div>
-                <h3 className="text-lg font-semibold mb-3">{s.title}</h3>
-                <p className="text-[13px] text-[color:var(--link)] leading-relaxed">{s.desc}</p>
+              <Card className="h-full bg-white/80 backdrop-blur-md border border-[#E8E3DB] p-8 rounded-[2rem] hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-full bg-[#FAF7F2] text-primary font-serif font-medium text-xl flex items-center justify-center mb-6">
+                  {s.n}
+                </div>
+                <h3 className="text-xl font-serif font-medium tracking-wide mb-3 text-foreground">
+                  {s.title}
+                </h3>
+                <p className="text-[15px] text-muted-foreground leading-relaxed">
+                  {s.desc}
+                </p>
               </Card>
             </Reveal>
           ))}
@@ -170,28 +350,58 @@ function HowItWorks() {
 
 function Showcase() {
   const blocks = [
-    { eyebrow: "The Memo", title: "Chat that cites its work", desc: "Every answer in Memo pulls from your uploaded material and shows the exact source. No hallucinations, no mystery.", icon: MessageSquare, img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80" },
-    { eyebrow: "Knowledge Graph", title: "See how your ideas connect", desc: "Every concept you study becomes a node. Watch your understanding compound as chapters link together.", icon: Network, img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80" },
-    { eyebrow: "Revision Queue", title: "Practice the things you actually miss", desc: "StudyMind surfaces the mistakes you keep making and turns them into flashcards. Focused, not random.", icon: ListChecks, img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80" },
+    {
+      eyebrow: "The Memo",
+      title: "Chat that cites its work",
+      desc: "Every answer in Memo pulls from your uploaded material and shows the exact source. No hallucinations, no mystery.",
+      icon: MessageSquare,
+      img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80",
+    },
+    {
+      eyebrow: "Knowledge Graph",
+      title: "See how your ideas connect",
+      desc: "Every concept you study becomes a node. Watch your understanding compound as chapters link together.",
+      icon: Network,
+      img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80",
+    },
+    {
+      eyebrow: "Revision Queue",
+      title: "Practice the things you miss",
+      desc: "Memoria surfaces the mistakes you keep making and turns them into flashcards. Focused, not random.",
+      icon: ListChecks,
+      img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80",
+    },
   ];
   return (
-    <section className="py-20 md:py-28">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8 space-y-24">
+    <section className="py-24 md:py-32 bg-background border-t border-border">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 space-y-32">
         {blocks.map((b, i) => (
           <Reveal key={b.title}>
-            <div className={`grid lg:grid-cols-2 gap-10 lg:gap-16 items-center ${i % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""}`}>
+            <div
+              className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${i % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""}`}
+            >
               <div>
-                <div className="soft-card p-2">
-                  <div className="rounded-2xl overflow-hidden border border-white/5">
-                    <img src={b.img} alt={b.title} className="w-full aspect-[4/3] object-cover" />
+                <div className="bg-[#FAF7F2] p-4 rounded-[3rem] border border-[#E8E3DB] shadow-sm">
+                  <div className="rounded-[2.5rem] overflow-hidden">
+                    <img
+                      src={b.img}
+                      alt={b.title}
+                      className="w-full aspect-[4/3] object-cover hover:scale-105 transition-transform duration-1000 ease-out"
+                    />
                   </div>
                 </div>
               </div>
               <div>
                 <Eyebrow>{b.eyebrow}</Eyebrow>
-                <h3 className="text-3xl md:text-4xl font-semibold tracking-tight mb-5 leading-tight">{b.title}</h3>
-                <p className="text-[15px] text-[color:var(--link)] leading-relaxed mb-6">{b.desc}</p>
-                <Button variant="outline" size="sm">Learn more <ArrowRight className="w-4 h-4" /></Button>
+                <h3 className="text-4xl md:text-5xl font-serif font-medium tracking-wide mb-6 leading-[1.1] text-foreground">
+                  {b.title}
+                </h3>
+                <p className="text-[17px] text-muted-foreground leading-relaxed mb-10 max-w-lg">
+                  {b.desc}
+                </p>
+                <Button variant="outline" size="lg" className="rounded-full">
+                  Learn more <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
               </div>
             </div>
           </Reveal>
@@ -203,21 +413,35 @@ function Showcase() {
 
 function Testimonials() {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-24 md:py-32 bg-[#FAF7F2] border-y border-border">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal>
-          <SectionHeading eyebrow="Loved by students" title="Real students, real revision" center />
+          <SectionHeading
+            eyebrow="Loved by students"
+            title="Real students, real revision"
+            center
+          />
         </Reveal>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {testimonials.map((t, i) => (
             <Reveal key={t.name} delay={i * 80}>
-              <Card className="h-full flex flex-col">
-                <p className="text-[13px] leading-relaxed mb-6 flex-1">"{t.quote}"</p>
-                <div className="flex items-center gap-3">
-                  <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full" />
+              <Card className="h-full flex flex-col p-8 bg-white border border-[#E8E3DB] shadow-sm hover:shadow-md transition-shadow rounded-[2rem]">
+                <p className="text-[15px] leading-relaxed mb-8 flex-1 text-foreground font-serif italic">
+                  "{t.quote}"
+                </p>
+                <div className="flex items-center gap-4">
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    className="w-12 h-12 rounded-full object-cover shadow-sm"
+                  />
                   <div>
-                    <div className="text-[13px] font-medium">{t.name}</div>
-                    <div className="text-[11px] text-[color:var(--link)]">{t.school}</div>
+                    <div className="text-[15px] font-medium text-foreground">
+                      {t.name}
+                    </div>
+                    <div className="text-[13px] text-muted-foreground tracking-wide">
+                      {t.school}
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -231,14 +455,21 @@ function Testimonials() {
 
 function Stats() {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-24 md:py-32 bg-background">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="soft-card p-10 md:p-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {stats.map((s) => (
-              <div key={s.label}>
-                <div className="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-2">{s.value}</div>
-                <div className="text-[12px] uppercase tracking-widest text-[color:var(--link)]">{s.label}</div>
+        <div className="bg-white rounded-[3rem] border border-[#E8E3DB] p-12 md:p-20 shadow-sm">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center divide-x-0 md:divide-x border-border">
+            {stats.map((s, i) => (
+              <div key={s.label} className={i !== 0 ? "md:pl-12" : ""}>
+                <div className="text-5xl md:text-6xl font-serif font-medium tracking-wide text-primary mb-4">
+                  <NumberCounter
+                    end={parseInt(s.value.replace(/\D/g, "") || "0")}
+                    suffix={s.value.replace(/[0-9]/g, "")}
+                  />
+                </div>
+                <div className="text-[14px] font-medium tracking-[0.1em] text-muted-foreground uppercase">
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
@@ -250,34 +481,71 @@ function Stats() {
 
 function Pricing() {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-24 md:py-32 bg-[#FAF7F2] border-y border-border">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal>
-          <SectionHeading eyebrow="Pricing" title="Simple pricing, big memory" center />
+          <SectionHeading
+            eyebrow="Pricing"
+            title="Simple pricing, big memory"
+            center
+          />
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {pricing.map((p, i) => (
             <Reveal key={p.name} delay={i * 100}>
-              <Card className={`h-full flex flex-col relative ${p.highlight ? "border-primary/60 glow-primary" : ""}`}>
+              <Card
+                className={`h-full flex flex-col relative p-10 rounded-[3rem] border transition-shadow ${p.highlight ? "bg-primary text-white border-primary shadow-[0_16px_32px_-8px_rgba(227,139,117,0.3)] hover:shadow-[0_24px_48px_-12px_rgba(227,139,117,0.4)]" : "bg-white text-foreground border-[#E8E3DB] shadow-sm hover:shadow-md"}`}
+              >
                 {p.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge variant="primary">Most Popular</Badge>
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <Badge
+                      variant="default"
+                      className="bg-white text-primary border-none shadow-md px-5 py-2 font-medium text-[12px] tracking-widest uppercase"
+                    >
+                      MOST POPULAR
+                    </Badge>
                   </div>
                 )}
-                <div className="text-[12px] uppercase tracking-widest text-[color:var(--link)] mb-3">{p.name}</div>
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className="text-4xl font-semibold">{p.price}</span>
-                  <span className="text-[13px] text-[color:var(--link)]">{p.period}</span>
+                <div
+                  className={`text-[15px] font-medium tracking-[0.1em] uppercase mb-4 ${p.highlight ? "text-white/80" : "text-muted-foreground"}`}
+                >
+                  {p.name}
                 </div>
-                <ul className="space-y-3 mb-8 flex-1">
+                <div className="flex items-baseline gap-2 mb-8">
+                  <span className="text-6xl font-serif font-medium tracking-wide">
+                    {p.price}
+                  </span>
+                  <span
+                    className={`text-[15px] font-medium ${p.highlight ? "text-white/80" : "text-muted-foreground"}`}
+                  >
+                    {p.period}
+                  </span>
+                </div>
+                <ul className="space-y-5 mb-10 flex-1">
                   {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-[13px]">
-                      <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                      <span>{f}</span>
+                    <li key={f} className="flex items-start gap-4 text-[16px]">
+                      <Check
+                        className={`w-5 h-5 shrink-0 mt-0.5 ${p.highlight ? "text-white" : "text-primary"}`}
+                        strokeWidth={2.5}
+                      />
+                      <span
+                        className={
+                          p.highlight ? "text-white/90" : "text-foreground"
+                        }
+                      >
+                        {f}
+                      </span>
                     </li>
                   ))}
                 </ul>
-                <Link to="/sign-up"><Button variant={p.highlight ? "primary" : "outline"} className="w-full">{p.cta}</Button></Link>
+                <Link to="/sign-up">
+                  <Button
+                    variant={p.highlight ? "secondary" : "outline"}
+                    className={`w-full rounded-full font-medium text-[15px] h-14 ${p.highlight ? "bg-white text-primary hover:bg-white/90 hover:text-primary hover:shadow-lg" : ""}`}
+                  >
+                    {p.cta}
+                  </Button>
+                </Link>
               </Card>
             </Reveal>
           ))}
@@ -290,22 +558,31 @@ function Pricing() {
 function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28 bg-background">
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
         <Reveal>
           <SectionHeading eyebrow="FAQ" title="Questions, answered" center />
         </Reveal>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {faq.map((f, i) => (
             <Reveal key={f.q} delay={i * 60}>
-              <div className="soft-card p-0 overflow-hidden">
-                <button className="w-full flex items-center justify-between text-left p-6 hover:bg-white/[0.02] transition-colors" onClick={() => setOpen(open === i ? null : i)}>
-                  <span className="font-medium text-[14px] pr-4">{f.q}</span>
-                  <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${open === i ? "rotate-180" : ""}`} />
+              <div className="bg-white rounded-[1.5rem] shadow-sm border border-border overflow-hidden transition-all">
+                <button
+                  className="w-full flex items-center justify-between text-left p-6 hover:bg-muted/30 transition-colors"
+                  onClick={() => setOpen(open === i ? null : i)}
+                >
+                  <span className="font-semibold tracking-tight text-[16px] pr-4 text-foreground">
+                    {f.q}
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 shrink-0 transition-transform text-foreground/60 ${open === i ? "rotate-180" : ""}`}
+                  />
                 </button>
-                {open === i && (
-                  <div className="px-6 pb-6 text-[13px] text-[color:var(--link)] leading-relaxed">{f.a}</div>
-                )}
+                <div
+                  className={`px-6 text-[15px] text-foreground/70 font-medium leading-relaxed transition-all duration-300 ${open === i ? "pb-6 max-h-[500px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"}`}
+                >
+                  {f.a}
+                </div>
               </div>
             </Reveal>
           ))}
@@ -317,19 +594,23 @@ function FAQSection() {
 
 function FinalCTA() {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-24 md:py-32 bg-background pb-12">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal>
-          <div className="relative overflow-hidden rounded-[2rem] p-10 md:p-20 text-center bg-gradient-to-br from-primary via-primary to-[#0000AA]">
-            <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_30%_30%,white,transparent_50%)]" />
-            <div className="relative">
-              <h2 className="text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05] mb-6 max-w-3xl mx-auto">
-                Start remembering everything you learn
+          <div className="relative overflow-hidden rounded-[3rem] p-12 md:p-24 text-center bg-primary">
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_0%,white,transparent_70%)]" />
+            <div className="relative z-10">
+              <Eyebrow>Join us</Eyebrow>
+              <h2 className="text-4xl md:text-6xl font-serif font-medium tracking-wide leading-[1.1] mb-8 max-w-3xl mx-auto text-white">
+                Start remembering everything you learn.
               </h2>
-              <p className="text-white/80 mb-8 max-w-xl mx-auto text-[15px]">Join thousands of students learning with a companion that never forgets.</p>
+              <p className="text-white/80 font-medium mb-12 max-w-xl mx-auto text-[17px] leading-relaxed">
+                Join thousands of students learning with a companion that never
+                forgets.
+              </p>
               <Link to="/sign-up">
-                <button className="inline-flex items-center gap-2 rounded-full bg-white text-primary px-7 py-4 font-medium hover:brightness-95 transition-all hover:-translate-y-0.5">
-                  Get Started Free <ArrowRight className="w-4 h-4" />
+                <button className="inline-flex items-center gap-2 bg-white text-primary rounded-full px-10 py-5 font-medium hover:-translate-y-1 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-[15px]">
+                  Get Started Free <ArrowRight className="w-5 h-5 ml-1" />
                 </button>
               </Link>
             </div>
