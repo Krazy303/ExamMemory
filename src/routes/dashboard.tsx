@@ -389,7 +389,7 @@ function Dashboard() {
                     </div>
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/20">
                       <span className="text-[11px] text-[color:var(--link)] font-medium">{w.subject}</span>
-                      <Link to="/revise" className="text-[11px] text-primary hover:underline font-semibold">Practice this →</Link>
+                      <Link to="/question-bank?tab=revise" className="text-[11px] text-primary hover:underline font-semibold">Practice this →</Link>
                     </div>
                   </div>
                 ))}
@@ -426,7 +426,7 @@ function Dashboard() {
               {[
                 { icon: MessageCircle, label: "Go to Workspace", to: "/memo", desc: "Ask a question" },
                 { icon: Upload, label: "Upload Notes", to: "/memo", desc: "Add study material" },
-                { icon: Sparkles, label: "Start Revision", to: "/revise", desc: "Review active flashcards" },
+                { icon: Sparkles, label: "Start Revision", to: "/question-bank?tab=revise", desc: "Review active flashcards" },
               ].map((a) => (
                 <Link key={a.label} to={a.to} className="block">
                   <Card className="hover:-translate-y-0.5 hover:border-primary/40 cursor-pointer bg-white border border-border">

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Search,
   ChevronDown,
@@ -9,6 +9,9 @@ import {
   ZoomOut,
   Brain,
   ListFilter,
+  Flame,
+  Sparkles,
+  ChevronRight,
 } from "lucide-react";
 import {
   Card,
@@ -35,7 +38,7 @@ export const Route = createFileRoute("/question-bank")({
       {
         name: "description",
         content:
-          "Your consolidated questions library and personal interactive knowledge graph.",
+          "Your consolidated questions library, interactive knowledge graph, and flashcard revision session.",
       },
     ],
   }),
@@ -89,18 +92,18 @@ function renderWrappedText(label: string, x: number) {
 }
 
 function QuestionBankPage() {
-  const [activeTab, setActiveTab] = useState<"questions" | "graph">("questions");
+  const [activeTab, setActiveTab] = useState<"questions" | "graph" | "revise">("questions");
 
   // Sync tab with query parameters
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab");
-    if (tab === "graph" || tab === "questions") {
-      setActiveTab(tab);
+    if (tab === "graph" || tab === "questions" || tab === "revise") {
+      setActiveTab(tab as any);
     }
   }, []);
 
-  const handleTabChange = (tab: "questions" | "graph") => {
+  const handleTabChange = (tab: "questions" | "graph" | "revise") => {
     setActiveTab(tab);
     // Update URL query parameters without refreshing
     const url = new URL(window.location.href);
@@ -108,15 +111,17 @@ function QuestionBankPage() {
     window.history.pushState({}, "", url.toString());
   };
 
-  // Questions library state
+  // Shared Questions List State
   const [questionsList, setQuestionsList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Questions library specific state
   const [subject, setSubject] = useState("All");
   const [source, setSource] = useState("All");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  // Knowledge Graph state
+  // Knowledge Graph specific state
   const [nodes, setNodes] = useState<GraphNode[]>([]);
   const [edges, setEdges] = useState<[string, string][]>([]);
   const [selected, setSelected] = useState<GraphNode | null>(null);
@@ -126,7 +131,14 @@ function QuestionBankPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  // Load chat histories to dynamically build questions and knowledge graph
+  // Revision Deck specific state
+  const [subjectFilter, setSubjectFilter] = useState("All");
+  const [chapterFilter, setChapterFilter] = useState("All");
+  const [idx, setIdx] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const [reviseStats, setReviseStats] = useState({ got: 0, almost: 0, learning: 0 });
+
+  // Load chat histories to dynamically build all three views
   useEffect(() => {
     setLoading(true);
     try {
@@ -262,7 +274,7 @@ function QuestionBankPage() {
     }
   }, []);
 
-  // Filter lists for questions
+  // Filter lists for questions library
   const subjectsOptions = useMemo(() => {
     const subs = Array.from(new Set(questionsList.map((q) => q.subject)));
     return ["All", ...subs];
@@ -372,6 +384,64 @@ function QuestionBankPage() {
       .filter(Boolean);
   }, [edges, nodes, selected]);
 
+  // Revision deck filtering & computed states
+  const reviseQuestions = useMemo(() => {
+    return questionsList.map((q) => ({
+      id: q.id,
+      q: q.question,
+      a: q.answer,
+      subject: q.subject,
+      chapter: q.chapter,
+    }));
+  }, [questionsList]);
+
+  const reviseSubjects = useMemo(() => {
+    const list = Array.from(new Set(reviseQuestions.map((q) => q.subject)));
+    return ["All", ...list];
+  }, [reviseQuestions]);
+
+  const reviseChapters = useMemo(() => {
+    const filteredQs = subjectFilter === "All" 
+      ? reviseQuestions 
+      : reviseQuestions.filter((q) => q.subject === subjectFilter);
+    const list = Array.from(new Set(filteredQs.map((q) => q.chapter)));
+    return ["All", ...list];
+  }, [reviseQuestions, subjectFilter]);
+
+  const activeCards = useMemo(() => {
+    return reviseQuestions.filter((q) => {
+      if (subjectFilter !== "All" && q.subject !== subjectFilter) return false;
+      if (chapterFilter !== "All" && q.chapter !== chapterFilter) return false;
+      return true;
+    });
+  }, [reviseQuestions, subjectFilter, chapterFilter]);
+
+  // Reset flashcards session when deck filters change
+  useEffect(() => {
+    setIdx(0);
+    setRevealed(false);
+    setReviseStats({ got: 0, almost: 0, learning: 0 });
+  }, [subjectFilter, chapterFilter]);
+
+  const card = activeCards[idx];
+  const done = idx >= activeCards.length;
+  const total = activeCards.length;
+
+  const rate = (kind: "got" | "almost" | "learning") => {
+    setReviseStats((s) => ({ ...s, [kind]: s[kind] + 1 }));
+    setRevealed(false);
+    setIdx((i) => i + 1);
+  };
+
+  const resetRevise = () => {
+    setIdx(0);
+    setRevealed(false);
+    setReviseStats({ got: 0, almost: 0, learning: 0 });
+  };
+
+  const reviewed = reviseStats.got + reviseStats.almost + reviseStats.learning;
+  const accuracy = reviewed > 0 ? Math.round((reviseStats.got / reviewed) * 100) : 0;
+
   const handleMouseDown = (e: React.MouseEvent<SVGSVGElement>) => {
     if (
       (e.target as HTMLElement).tagName === "circle" ||
@@ -404,7 +474,7 @@ function QuestionBankPage() {
           Your Knowledge & Questions
         </h1>
         <p className="text-[color:var(--link)] mt-2.5 text-[14.5px] leading-relaxed">
-          Everything you've ever asked, generated, or structured — represented as a list of questions or visualized inside your dynamic cognitive map.
+          Everything you've ever asked, generated, or structured — represented as a list, visualized inside your cognitive map, or reviewed in flashcard drills.
           {loading && (
             <span className="text-[10px] uppercase ml-2 text-primary animate-pulse font-semibold">
               (Syncing...)
@@ -414,12 +484,12 @@ function QuestionBankPage() {
       </header>
 
       {/* Modern sliding tab selector */}
-      <div className="flex justify-center mb-10">
-        <div className="inline-flex p-1.5 rounded-full bg-white/50 backdrop-blur border border-[#E8E3DB] shadow-sm">
+      <div className="flex justify-center mb-10 overflow-x-auto max-w-full scrollbar-none pb-2">
+        <div className="inline-flex p-1.5 rounded-full bg-white/50 backdrop-blur border border-[#E8E3DB] shadow-sm shrink-0">
           <button
             onClick={() => handleTabChange("questions")}
             className={cn(
-              "flex items-center gap-2 px-6 py-2.5 rounded-full text-[13.5px] font-semibold transition-all duration-300 cursor-pointer",
+              "flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] sm:text-[13.5px] font-semibold transition-all duration-300 cursor-pointer shrink-0",
               activeTab === "questions"
                 ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]"
                 : "text-foreground/70 hover:text-foreground hover:bg-[#FAF7F2]/60"
@@ -431,7 +501,7 @@ function QuestionBankPage() {
           <button
             onClick={() => handleTabChange("graph")}
             className={cn(
-              "flex items-center gap-2 px-6 py-2.5 rounded-full text-[13.5px] font-semibold transition-all duration-300 cursor-pointer",
+              "flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] sm:text-[13.5px] font-semibold transition-all duration-300 cursor-pointer shrink-0",
               activeTab === "graph"
                 ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]"
                 : "text-foreground/70 hover:text-foreground hover:bg-[#FAF7F2]/60"
@@ -440,10 +510,23 @@ function QuestionBankPage() {
             <Brain className="w-4 h-4" />
             Knowledge Graph
           </button>
+          <button
+            onClick={() => handleTabChange("revise")}
+            className={cn(
+              "flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] sm:text-[13.5px] font-semibold transition-all duration-300 cursor-pointer shrink-0",
+              activeTab === "revise"
+                ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]"
+                : "text-foreground/70 hover:text-foreground hover:bg-[#FAF7F2]/60"
+            )}
+          >
+            <RotateCw className="w-4 h-4" />
+            Revision Deck
+          </button>
         </div>
       </div>
 
-      {activeTab === "questions" ? (
+      {/* QUESTIONS LIBRARY TAB */}
+      {activeTab === "questions" && (
         <section className="animate-in fade-in duration-300">
           <div className="soft-card p-4 mb-6 flex flex-col md:flex-row gap-3">
             <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-[#E8E3DB]">
@@ -498,7 +581,10 @@ function QuestionBankPage() {
             </div>
           )}
         </section>
-      ) : (
+      )}
+
+      {/* KNOWLEDGE GRAPH TAB */}
+      {activeTab === "graph" && (
         <section className="animate-in fade-in duration-300">
           {nodes.length <= 1 ? (
             <Card className="text-center py-20 max-w-2xl mx-auto border border-dashed border-border rounded-[2.5rem] bg-white">
@@ -516,7 +602,6 @@ function QuestionBankPage() {
           ) : (
             <div className="space-y-4">
               <div className="soft-card p-4 flex items-center justify-between flex-wrap gap-3">
-                {/* Dynamic Optgroup Dropdown Select containing Subjects, Chapters, and Concepts */}
                 <div className="relative">
                   <select
                     value={filterSelection}
@@ -549,7 +634,6 @@ function QuestionBankPage() {
                   <ChevronDown className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground" />
                 </div>
                 
-                {/* Pan & Zoom Controls */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setZoom(z => Math.min(z + 0.15, 2.5))}
@@ -596,7 +680,6 @@ function QuestionBankPage() {
                     </defs>
                     <rect width="800" height="550" fill="url(#bgGlow)" />
                     
-                    {/* Scaled & Translated Canvas Group */}
                     <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
                       {visibleEdges.map(([a, b], i) => {
                         const na = nodes.find((n) => n.id === a)!;
@@ -636,7 +719,6 @@ function QuestionBankPage() {
                               opacity={isSel ? 1 : 0.9}
                               className="transition-all duration-300"
                             />
-                            {/* Multi-line wrapped text labels for clean layout */}
                             <text
                               x={n.x}
                               y={n.y + st.r + 14}
@@ -655,7 +737,6 @@ function QuestionBankPage() {
                     </g>
                   </svg>
                   
-                  {/* Canvas Action Helper Overlay */}
                   <div className="absolute bottom-4 left-4 text-[10.5px] text-muted-foreground pointer-events-none bg-white/70 backdrop-blur px-3 py-1 rounded-full border border-border">
                     Drag to pan • Use buttons to zoom
                   </div>
@@ -719,6 +800,204 @@ function QuestionBankPage() {
                     Every subject, chapter, concept, and mistake you've encountered becomes a node. 
                     Connections show how ideas connect across your studies, helping you identify knowledge gaps and visual clusters.
                   </p>
+                </Card>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* REVISION DECK TAB */}
+      {activeTab === "revise" && (
+        <section className="animate-in fade-in duration-300">
+          {reviseQuestions.length === 0 ? (
+            <Card className="text-center py-20 max-w-2xl mx-auto border border-dashed border-border rounded-[2.5rem] bg-white">
+              <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-4">
+                <Brain className="w-8 h-8 text-primary" />
+              </div>
+              <h2 className="text-2xl font-semibold mb-2">No flashcards available yet</h2>
+              <p className="text-[color:var(--link)] text-[13px] mb-8 max-w-sm mx-auto leading-relaxed">
+                Upload notes and chat with Memoria in the Workspace. Your study questions and AI answers will automatically show up here as a custom revision deck!
+              </p>
+              <Link to="/memo">
+                <Button size="lg" className="rounded-full">Go to Study Workspace</Button>
+              </Link>
+            </Card>
+          ) : (
+            <div className="grid lg:grid-cols-[1fr_280px] gap-6">
+              <div className="space-y-6">
+                {/* Revision Deck filters */}
+                <div className="soft-card p-4 flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1 flex flex-col gap-1.5">
+                    <label className="text-[10.5px] uppercase tracking-widest text-muted-foreground font-bold">
+                      Subject
+                    </label>
+                    <select
+                      value={subjectFilter}
+                      onChange={(e) => setSubjectFilter(e.target.value)}
+                      className="w-full bg-[#FAF7F2] border border-border rounded-xl px-3 py-2 text-[13px] text-foreground focus:outline-none focus:border-primary/50 cursor-pointer"
+                    >
+                      {reviseSubjects.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex-1 flex flex-col gap-1.5">
+                    <label className="text-[10.5px] uppercase tracking-widest text-muted-foreground font-bold">
+                      Topic / Chapter
+                    </label>
+                    <select
+                      value={chapterFilter}
+                      onChange={(e) => setChapterFilter(e.target.value)}
+                      className="w-full bg-[#FAF7F2] border border-border rounded-xl px-3 py-2 text-[13px] text-foreground focus:outline-none focus:border-primary/50 cursor-pointer"
+                    >
+                      {reviseChapters.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {activeCards.length === 0 ? (
+                  <Card className="text-center py-16 border border-dashed rounded-[2rem] bg-white">
+                    <h2 className="text-lg font-semibold mb-2">No cards matching filters</h2>
+                    <p className="text-[color:var(--link)] text-[13px]">
+                      Try selecting a different subject or topic to practice.
+                    </p>
+                  </Card>
+                ) : (
+                  <div>
+                    <div className="mb-4 flex items-center justify-between text-[12px] text-muted-foreground font-semibold">
+                      <span>
+                        Card {Math.min(idx + 1, total)} of {total}
+                      </span>
+                      <span>
+                        {Math.round((Math.min(idx, total) / total) * 100)}% complete
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-[#FAF7F2] border border-border/40 rounded-full overflow-hidden mb-8">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all"
+                        style={{ width: `${(Math.min(idx, total) / total) * 100}%` }}
+                      />
+                    </div>
+
+                    {done ? (
+                      <Card className="text-center py-16 rounded-[2rem] bg-white border border-border space-y-4">
+                        <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 grid place-items-center mx-auto text-primary">
+                          <Flame className="w-7 h-7" />
+                        </div>
+                        <h2 className="text-2xl font-semibold text-foreground">Session complete!</h2>
+                        <p className="text-[13.5px] text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                          You reviewed **{total} cards** with **{accuracy}% accuracy** during this session.
+                        </p>
+                        <Button onClick={resetRevise} className="rounded-full font-semibold">
+                          <RotateCw className="w-4 h-4 mr-1.5" /> Start over
+                        </Button>
+                      </Card>
+                    ) : (
+                      <Card className="min-h-[360px] flex flex-col justify-between rounded-[2.5rem] bg-white border border-border p-8 shadow-sm">
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap mb-6">
+                            <Badge variant="muted">Question</Badge>
+                            <Badge variant="default" className="capitalize">{card.subject}</Badge>
+                            <Badge variant="outline" className="capitalize">{card.chapter}</Badge>
+                          </div>
+                          <div className="text-xl md:text-2xl font-serif font-medium leading-relaxed text-foreground">
+                            {card.q}
+                          </div>
+                          {revealed && (
+                            <div className="mt-8 pt-8 border-t border-border animate-in fade-in duration-300">
+                              <Badge variant="primary" className="mb-4">
+                                Answer
+                              </Badge>
+                              <div className="text-[14.5px] text-foreground/80 leading-relaxed whitespace-pre-wrap font-medium">
+                                <Markdown text={card.a} />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-8 pt-6 border-t border-border/10">
+                          {!revealed ? (
+                            <Button
+                              className="w-full rounded-full font-semibold h-12 text-[14.5px] cursor-pointer"
+                              size="lg"
+                              onClick={() => setRevealed(true)}
+                            >
+                              Reveal Answer
+                            </Button>
+                          ) : (
+                            <div className="grid grid-cols-3 gap-3">
+                              <button
+                                onClick={() => rate("learning")}
+                                className="rounded-full py-3 text-[12.5px] font-semibold border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition cursor-pointer"
+                              >
+                                Still Learning
+                              </button>
+                              <button
+                                onClick={() => rate("almost")}
+                                className="rounded-full py-3 text-[12.5px] font-semibold border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition cursor-pointer"
+                              >
+                                Almost There
+                              </button>
+                              <button
+                                onClick={() => rate("got")}
+                                className="rounded-full py-3 text-[12.5px] font-semibold border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition cursor-pointer"
+                              >
+                                Got It
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <Eyebrow>Session Stats</Eyebrow>
+                {[
+                  { label: "Reviewed Cards", value: reviewed },
+                  { label: "Session Accuracy", value: `${accuracy}%` },
+                  { label: "Active Streak", value: "14d" },
+                ].map((s) => (
+                  <Card key={s.label} className="p-5 rounded-2xl bg-white border border-border">
+                    <div className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">
+                      {s.label}
+                    </div>
+                    <div className="text-2xl font-bold mt-1.5 text-foreground">{s.value}</div>
+                  </Card>
+                ))}
+                
+                <Card className="p-5 rounded-2xl bg-white border border-border">
+                  <div className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-4">
+                    Rating breakdown
+                  </div>
+                  <div className="space-y-3 text-[12.5px] font-medium">
+                    <div className="flex justify-between items-center">
+                      <span className="text-emerald-600 flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Got It
+                      </span>
+                      <span className="text-foreground/75">{reviseStats.got}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-amber-600 flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Almost
+                      </span>
+                      <span className="text-foreground/75">{reviseStats.almost}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-red-600 flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-red-500" /> Learning
+                      </span>
+                      <span className="text-foreground/75">{reviseStats.learning}</span>
+                    </div>
+                  </div>
                 </Card>
               </div>
             </div>
