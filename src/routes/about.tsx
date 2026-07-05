@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Shield, Anchor, Heart, Brain, ArrowRight } from "lucide-react";
+import { Shield, Anchor, Heart, Brain, ArrowRight, Linkedin } from "lucide-react";
 import {
   Card,
   Button,
@@ -163,28 +163,49 @@ function About() {
             />
           </Reveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {team.map((m, i) => (
-              <Reveal key={m.name} delay={i * 80}>
-                <div className="group relative h-full">
-                  <div className="absolute -inset-0.5 rounded-[2rem] bg-gradient-to-br from-primary/15 to-purple-500/15 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+            {team.map((m, i) => {
+              const avatarUrl = m.linkedin
+                ? `https://unavatar.io/linkedin/${m.linkedin}`
+                : m.avatar;
 
-                  <Card className="relative h-full text-center p-8 bg-white/80 backdrop-blur-xl border border-[#E8E3DB] shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 rounded-[2rem] flex flex-col items-center">
-                    <img
-                      src={m.avatar}
-                      alt={m.name}
-                      className="w-20 h-20 rounded-full mx-auto mb-4 object-cover border border-white/50 shadow-md group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors duration-300">{m.name}</div>
-                    <div className="text-[11px] uppercase tracking-widest text-primary/70 mt-1 font-semibold">
-                      {m.role}
-                    </div>
-                    <div className="text-[13px] text-muted-foreground mt-3 leading-relaxed">
-                      {m.bio}
-                    </div>
-                  </Card>
-                </div>
-              </Reveal>
-            ))}
+              return (
+                <Reveal key={m.name} delay={i * 80}>
+                  <div className="group relative h-full">
+                    <div className="absolute -inset-0.5 rounded-[2rem] bg-gradient-to-br from-primary/15 to-purple-500/15 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
+
+                    <Card className="relative h-full text-center p-8 bg-white/80 backdrop-blur-xl border border-[#E8E3DB] shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 rounded-[2rem] flex flex-col items-center">
+                      <img
+                        src={avatarUrl}
+                        alt={m.name}
+                        className="w-20 h-20 rounded-full mx-auto mb-4 object-cover border border-white/50 shadow-md group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          // Fallback to static avatar if unavatar fetch fails
+                          (e.target as HTMLImageElement).src = m.avatar;
+                        }}
+                      />
+                      <div className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors duration-300">{m.name}</div>
+                      <div className="text-[11px] uppercase tracking-widest text-primary/70 mt-1 font-semibold">
+                        {m.role}
+                      </div>
+                      <div className="text-[13px] text-muted-foreground mt-3 leading-relaxed flex-1">
+                        {m.bio}
+                      </div>
+                      {m.linkedin && (
+                        <a
+                          href={`https://linkedin.com/in/${m.linkedin}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-4 p-2 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-300"
+                          aria-label={`${m.name}'s LinkedIn Profile`}
+                        >
+                          <Linkedin className="w-5 h-5" />
+                        </a>
+                      )}
+                    </Card>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>

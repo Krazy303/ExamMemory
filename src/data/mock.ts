@@ -610,18 +610,21 @@ export const team = [
     role: "Backend Developer",
     bio: "UIT, KU",
     avatar: "/avatar.png",
+    linkedin: "rushikeshgiri-gauswami-848058329",
   },
   {
     name: "Sanskar Patil",
     role: "Frontend Developer",
     bio: "UIT, KU",
     avatar: "/avatar.png",
+    linkedin: "sanskar-patil-36a880382",
   },
   {
     name: "Abhay Purohit",
     role: "Design & Integration",
     bio: "UIT, KU",
     avatar: "/avatar.png",
+    linkedin: "abhay-purohit-31514b402",
   },
 ];
 
