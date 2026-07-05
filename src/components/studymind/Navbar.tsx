@@ -8,7 +8,6 @@ import { useAuth } from "@/context/AuthContext";
 const navItems = [
   { to: "/", label: "Home" },
   { to: "/memo", label: "Memo" },
-  { to: "/settings", label: "Settings" },
   { to: "/question-bank", label: "Library" },
   { to: "/about", label: "About" },
   { to: "/guide", label: "Guide" },

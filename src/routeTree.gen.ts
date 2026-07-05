@@ -18,6 +18,7 @@ import { Route as QuestionBankRouteImport } from './routes/question-bank'
 import { Route as MemoRouteImport } from './routes/memo'
 import { Route as KnowledgeGraphRouteImport } from './routes/knowledge-graph'
 import { Route as GuideRouteImport } from './routes/guide'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -67,6 +68,11 @@ const GuideRoute = GuideRouteImport.update({
   path: '/guide',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogRoute = BlogRouteImport.update({
   id: '/blog',
   path: '/blog',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
+  '/dashboard': typeof DashboardRoute
   '/guide': typeof GuideRoute
   '/knowledge-graph': typeof KnowledgeGraphRoute
   '/memo': typeof MemoRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
+  '/dashboard': typeof DashboardRoute
   '/guide': typeof GuideRoute
   '/knowledge-graph': typeof KnowledgeGraphRoute
   '/memo': typeof MemoRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
+  '/dashboard': typeof DashboardRoute
   '/guide': typeof GuideRoute
   '/knowledge-graph': typeof KnowledgeGraphRoute
   '/memo': typeof MemoRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/blog'
+    | '/dashboard'
     | '/guide'
     | '/knowledge-graph'
     | '/memo'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/blog'
+    | '/dashboard'
     | '/guide'
     | '/knowledge-graph'
     | '/memo'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/blog'
+    | '/dashboard'
     | '/guide'
     | '/knowledge-graph'
     | '/memo'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BlogRoute: typeof BlogRoute
+  DashboardRoute: typeof DashboardRoute
   GuideRoute: typeof GuideRoute
   KnowledgeGraphRoute: typeof KnowledgeGraphRoute
   MemoRoute: typeof MemoRoute
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuideRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog': {
       id: '/blog'
       path: '/blog'
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BlogRoute: BlogRoute,
+  DashboardRoute: DashboardRoute,
   GuideRoute: GuideRoute,
   KnowledgeGraphRoute: KnowledgeGraphRoute,
   MemoRoute: MemoRoute,
