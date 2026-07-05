@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, Leaf, ChevronDown, LogOut, Settings as SettingsIcon, Brain } from "lucide-react";
+import { Menu, X, Leaf, ChevronDown, LogOut, Settings as SettingsIcon, Brain, LayoutDashboard } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button, MemoriaLogo } from "./primitives";
@@ -109,12 +109,12 @@ export function Navbar() {
 
                   <div className="space-y-1">
                     <Link
-                      to="/settings"
+                      to="/dashboard"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:text-foreground hover:bg-muted transition-colors font-medium"
                     >
-                      <SettingsIcon className="w-4 h-4 text-primary shrink-0" />
-                      Settings
+                      <LayoutDashboard className="w-4 h-4 text-primary shrink-0" />
+                      My Dashboard
                     </Link>
                     <Link
                       to="/memo"
@@ -263,12 +263,12 @@ export function AppNavbar() {
             Memoria
           </span>
         </Link>
-        <Link to="/settings">
+        <Link to="/dashboard">
           <Button
             size="sm"
             className="rounded-full font-medium bg-primary hover:bg-primary/90 text-white border-transparent text-[13px] px-4 py-1.5 flex items-center gap-1.5 transition-all shadow-[0_4px_12px_rgba(234,88,12,0.2)]"
           >
-            ← Back to Settings
+            ← Back to Dashboard
           </Button>
         </Link>
       </div>

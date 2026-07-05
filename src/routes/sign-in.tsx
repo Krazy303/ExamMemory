@@ -32,7 +32,7 @@ function SignIn() {
     setError(null);
     try {
       await signIn(email);
-      navigate({ to: "/settings" });
+      navigate({ to: "/dashboard" });
     } catch (e: any) {
       setError(e.message || "Failed to sign in");
     } finally {

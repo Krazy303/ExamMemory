@@ -36,7 +36,7 @@ export function Footer() {
               title: "Product",
               links: [
                 ["Memo", "/memo"],
-                ["Settings", "/settings"],
+                ["My Dashboard", "/dashboard"],
                 ["Question Bank", "/question-bank?tab=questions"],
                 ["Knowledge Graph", "/question-bank?tab=graph"],
               ],
