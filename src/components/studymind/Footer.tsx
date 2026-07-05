@@ -37,8 +37,8 @@ export function Footer() {
               links: [
                 ["Memo", "/memo"],
                 ["Settings", "/settings"],
-                ["Question Bank", "/question-bank"],
-                ["Knowledge Graph", "/knowledge-graph"],
+                ["Question Bank", "/question-bank?tab=questions"],
+                ["Knowledge Graph", "/question-bank?tab=graph"],
               ],
             },
             {
