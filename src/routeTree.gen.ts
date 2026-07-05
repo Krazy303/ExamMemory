@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviseRouteImport } from './routes/revise'
 import { Route as QuestionBankRouteImport } from './routes/question-bank'
 import { Route as MemoRouteImport } from './routes/memo'
 import { Route as KnowledgeGraphRouteImport } from './routes/knowledge-graph'
-import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as GuideRouteImport } from './routes/guide'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -33,6 +35,11 @@ const SignUpRoute = SignUpRouteImport.update({
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReviseRoute = ReviseRouteImport.update({
@@ -55,9 +62,14 @@ const KnowledgeGraphRoute = KnowledgeGraphRouteImport.update({
   path: '/knowledge-graph',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const GuideRoute = GuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -74,11 +86,13 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/dashboard': typeof DashboardRoute
+  '/blog': typeof BlogRoute
+  '/guide': typeof GuideRoute
   '/knowledge-graph': typeof KnowledgeGraphRoute
   '/memo': typeof MemoRoute
   '/question-bank': typeof QuestionBankRoute
   '/revise': typeof ReviseRoute
+  '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/timeline': typeof TimelineRoute
@@ -86,11 +100,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/dashboard': typeof DashboardRoute
+  '/blog': typeof BlogRoute
+  '/guide': typeof GuideRoute
   '/knowledge-graph': typeof KnowledgeGraphRoute
   '/memo': typeof MemoRoute
   '/question-bank': typeof QuestionBankRoute
   '/revise': typeof ReviseRoute
+  '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/timeline': typeof TimelineRoute
@@ -99,11 +115,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/dashboard': typeof DashboardRoute
+  '/blog': typeof BlogRoute
+  '/guide': typeof GuideRoute
   '/knowledge-graph': typeof KnowledgeGraphRoute
   '/memo': typeof MemoRoute
   '/question-bank': typeof QuestionBankRoute
   '/revise': typeof ReviseRoute
+  '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/timeline': typeof TimelineRoute
@@ -113,11 +131,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/dashboard'
+    | '/blog'
+    | '/guide'
     | '/knowledge-graph'
     | '/memo'
     | '/question-bank'
     | '/revise'
+    | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/timeline'
@@ -125,11 +145,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/dashboard'
+    | '/blog'
+    | '/guide'
     | '/knowledge-graph'
     | '/memo'
     | '/question-bank'
     | '/revise'
+    | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/timeline'
@@ -137,11 +159,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/dashboard'
+    | '/blog'
+    | '/guide'
     | '/knowledge-graph'
     | '/memo'
     | '/question-bank'
     | '/revise'
+    | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/timeline'
@@ -150,11 +174,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  DashboardRoute: typeof DashboardRoute
+  BlogRoute: typeof BlogRoute
+  GuideRoute: typeof GuideRoute
   KnowledgeGraphRoute: typeof KnowledgeGraphRoute
   MemoRoute: typeof MemoRoute
   QuestionBankRoute: typeof QuestionBankRoute
   ReviseRoute: typeof ReviseRoute
+  SettingsRoute: typeof SettingsRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   TimelineRoute: typeof TimelineRoute
@@ -181,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-in'
       fullPath: '/sign-in'
       preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/revise': {
@@ -211,11 +244,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeGraphRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/guide': {
+      id: '/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof GuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -238,11 +278,13 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  DashboardRoute: DashboardRoute,
+  BlogRoute: BlogRoute,
+  GuideRoute: GuideRoute,
   KnowledgeGraphRoute: KnowledgeGraphRoute,
   MemoRoute: MemoRoute,
   QuestionBankRoute: QuestionBankRoute,
   ReviseRoute: ReviseRoute,
+  SettingsRoute: SettingsRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   TimelineRoute: TimelineRoute,
