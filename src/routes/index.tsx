@@ -449,9 +449,11 @@ function Showcase() {
                 <p className="text-[17px] text-muted-foreground leading-relaxed mb-10 max-w-lg">
                   {b.desc}
                 </p>
-                <Button variant="outline" size="lg" className="rounded-full">
-                  Learn more <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
+                <Link to="/guide">
+                  <Button variant="outline" size="lg" className="rounded-full">
+                    Learn more <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </Reveal>
