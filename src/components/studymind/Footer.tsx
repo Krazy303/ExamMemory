@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Twitter, Github, Linkedin, Youtube } from "lucide-react";
-import { Button, MemoriaLogo } from "./primitives";
+import { Button, StudyMemoLogo } from "./primitives";
 
 export function Footer() {
   return (
@@ -10,9 +10,9 @@ export function Footer() {
           <div className="col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-primary grid place-items-center shadow-sm">
-                <MemoriaLogo className="w-4 h-4 text-white" />
+                <StudyMemoLogo className="w-4 h-4 text-white" />
               </div>
-              <span className="font-serif font-medium text-xl">Memoria</span>
+              <span className="font-serif font-medium text-xl">StudyMemo</span>
             </Link>
             <p className="text-[13px] text-[color:var(--link)] leading-relaxed max-w-xs">
               The memory-powered AI study companion. Consistent, source-cited,
@@ -35,10 +35,10 @@ export function Footer() {
             {
               title: "Product",
               links: [
-                ["Memo", "/memo"],
-                ["Settings", "/settings"],
-                ["Question Bank", "/question-bank"],
-                ["Knowledge Graph", "/knowledge-graph"],
+                ["Memo AI", "/memo"],
+                ["My Dashboard", "/dashboard"],
+                ["Question Bank", "/question-bank?tab=questions"],
+                ["Knowledge Graph", "/question-bank?tab=graph"],
               ],
             },
             {
@@ -99,7 +99,7 @@ export function Footer() {
             <Button size="sm">Subscribe</Button>
           </div>
           <p className="text-[12px] text-[color:var(--link)]">
-            © 2026 Memoria Labs. All rights reserved.
+            © 2026 StudyMemo Labs. All rights reserved.
           </p>
         </div>
       </div>

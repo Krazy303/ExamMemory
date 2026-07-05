@@ -12,8 +12,8 @@ import { cn } from "@/lib/utils";
 type BtnVariant = "primary" | "outline" | "ghost" | "secondary";
 type BtnSize = "sm" | "md" | "lg";
 
-export const MemoriaLogo = ({ className = "w-6 h-6" }: { className?: string }) => (
-  <img src="/logo.png" alt="Memoria Logo" className={cn("object-contain", className)} />
+export const StudyMemoLogo = ({ className = "w-6 h-6" }: { className?: string }) => (
+  <img src="/logo.png" alt="StudyMemo Logo" className={cn("object-contain", className)} />
 );
 
 export const Button = forwardRef<

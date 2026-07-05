@@ -1,14 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, Leaf, ChevronDown, LogOut, Settings as SettingsIcon, Brain } from "lucide-react";
+import { Menu, X, Leaf, ChevronDown, LogOut, Settings as SettingsIcon, Brain, LayoutDashboard } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Button, MemoriaLogo } from "./primitives";
+import { Button, StudyMemoLogo } from "./primitives";
 import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { to: "/", label: "Home" },
-  { to: "/memo", label: "Memo" },
-  { to: "/settings", label: "Settings" },
+  { to: "/memo", label: "Memo AI" },
   { to: "/question-bank", label: "Library" },
   { to: "/about", label: "About" },
   { to: "/guide", label: "Guide" },
@@ -45,10 +44,10 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl h-16 rounded-full bg-[#FAF7F2]/80 backdrop-blur-md border border-[#E8E3DB] shadow-sm flex items-center justify-between px-6 pointer-events-auto">
         <Link to="/" className="flex items-center gap-2.5 shrink-0">
           <div className="w-9 h-9 rounded-full bg-primary grid place-items-center shadow-sm">
-            <MemoriaLogo className="w-5 h-5 text-white" />
+            <StudyMemoLogo className="w-5 h-5 text-white" />
           </div>
           <span className="font-serif font-medium text-2xl tracking-wide text-foreground mt-0.5">
-            Memoria
+            StudyMemo
           </span>
         </Link>
 
@@ -110,12 +109,12 @@ export function Navbar() {
 
                   <div className="space-y-1">
                     <Link
-                      to="/settings"
+                      to="/dashboard"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:text-foreground hover:bg-muted transition-colors font-medium"
                     >
-                      <SettingsIcon className="w-4 h-4 text-primary shrink-0" />
-                      Settings
+                      <LayoutDashboard className="w-4 h-4 text-primary shrink-0" />
+                      My Dashboard
                     </Link>
                     <Link
                       to="/memo"
@@ -174,7 +173,7 @@ export function Navbar() {
           <div className="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-background border-l border-border p-6 animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between mb-8">
               <span className="font-serif text-xl tracking-wide">
-                Memoria
+                StudyMemo
               </span>
               <button onClick={() => setOpen(false)} className="p-2">
                 <X className="w-5 h-5" />
@@ -258,18 +257,18 @@ export function AppNavbar() {
       <div className="mx-auto max-w-7xl px-5 sm:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full bg-primary grid place-items-center shadow-sm">
-            <MemoriaLogo className="w-4 h-4 text-white" />
+            <StudyMemoLogo className="w-4 h-4 text-white" />
           </div>
           <span className="font-serif text-xl font-medium tracking-wide mt-0.5">
-            Memoria
+            StudyMemo
           </span>
         </Link>
-        <Link to="/settings">
+        <Link to="/dashboard">
           <Button
             size="sm"
             className="rounded-full font-medium bg-primary hover:bg-primary/90 text-white border-transparent text-[13px] px-4 py-1.5 flex items-center gap-1.5 transition-all shadow-[0_4px_12px_rgba(234,88,12,0.2)]"
           >
-            ← Back to Settings
+            ← Back to Dashboard
           </Button>
         </Link>
       </div>

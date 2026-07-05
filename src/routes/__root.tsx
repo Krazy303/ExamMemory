@@ -80,15 +80,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       meta: [
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { title: "Memoria — The memory-powered AI study companion" },
+        { title: "StudyMemo — The memory-powered AI study companion" },
         {
           name: "description",
           content:
-            "Memoria remembers your notes, past papers, and mistakes so every answer is consistent and source-cited.",
+            "StudyMemo remembers your notes, past papers, and mistakes so every answer is consistent and source-cited.",
         },
         {
           property: "og:title",
-          content: "Memoria — Never Get a Different Answer Twice",
+          content: "StudyMemo — Never Get a Different Answer Twice",
         },
         {
           property: "og:description",

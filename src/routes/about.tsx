@@ -12,7 +12,7 @@ import { team, values } from "@/data/mock";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Us — Memoria" },
+      { title: "About Us — StudyMemo" },
       {
         name: "description",
         content: "Giving every student an AI that actually remembers them.",
@@ -63,7 +63,7 @@ function About() {
                 Confidence dropped. Trust broke.
               </p>
               <p className="text-[color:var(--link)] leading-relaxed text-[14px]">
-                Memoria is our fix: a companion built around persistent
+                StudyMemo is our fix: a companion built around persistent
                 memory, so every answer is grounded, consistent, and tied to
                 your own material. No more restarting from zero every session.
               </p>
@@ -96,7 +96,7 @@ function About() {
           
           <div className="mt-6 text-center max-w-3xl mx-auto mb-16">
             <p className="text-[16px] text-muted-foreground leading-relaxed">
-              Standard AI systems suffer from "short-term memory loss." They treat every prompt as a blank slate. Memoria uses Cognee's open-source cognitive memory engine to build a structured, long-term memory graph directly grounded in your study files.
+              Standard AI systems suffer from "short-term memory loss." They treat every prompt as a blank slate. StudyMemo uses Cognee's open-source cognitive memory engine to build a structured, long-term memory graph directly grounded in your study files.
             </p>
           </div>
 
@@ -116,7 +116,7 @@ function About() {
               },
               {
                 title: "3. Hybrid GraphRAG",
-                desc: "Memoria searches both vector embeddings (for semantic text similarity) and graph paths (for complex relationships), delivering 100% consistent, source-cited answers.",
+                desc: "StudyMemo searches both vector embeddings (for semantic text similarity) and graph paths (for complex relationships), delivering 100% consistent, source-cited answers.",
                 gradient: "from-emerald-500/20 to-teal-500/20",
                 bgHover: "hover:bg-emerald-50/50",
               }
@@ -158,7 +158,7 @@ function About() {
           <Reveal>
             <SectionHeading
               eyebrow="The team"
-              title="The people behind Memoria"
+              title="The people behind StudyMemo"
               center
             />
           </Reveal>

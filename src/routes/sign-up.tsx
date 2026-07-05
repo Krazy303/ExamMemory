@@ -4,8 +4,8 @@ import { AuthShell, Field } from "./sign-in";
 export const Route = createFileRoute("/sign-up")({
   head: () => ({
     meta: [
-      { title: "Sign Up — Memoria" },
-      { name: "description", content: "Create your Memoria account." },
+      { title: "Sign Up — StudyMemo" },
+      { name: "description", content: "Create your StudyMemo account." },
     ],
   }),
   component: SignUp,
@@ -38,7 +38,7 @@ function SignUp() {
     
     try {
       await signIn(email, name);
-      navigate({ to: "/settings" });
+      navigate({ to: "/dashboard" });
     } catch (e: any) {
       setError(e.message || "Failed to sign up");
     } finally {

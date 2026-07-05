@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
-import { BookOpen, Compass, Key, Brain, Sparkles, CheckCircle2, ChevronRight, Database, Cpu, Sliders } from "lucide-react";
+import { BookOpen, Compass, Key, Brain, Sparkles, CheckCircle2, ChevronRight, Database, Cpu, Sliders, RotateCw } from "lucide-react";
 import {
   Card,
   Badge,
@@ -12,7 +12,7 @@ import { Reveal } from "@/components/studymind/primitives";
 export const Route = createFileRoute("/guide")({
   head: () => ({
     meta: [
-      { title: "User Guide — Memoria" },
+      { title: "User Guide — StudyMemo" },
       {
         name: "description",
         content: "Learn how to get the most out of your persistent-memory AI study companion.",
@@ -26,7 +26,7 @@ function GuidePage() {
   const steps = [
     {
       title: "1. Index Study Material",
-      desc: "Upload PDFs, Word documents, PowerPoint slides, or text files directly into Memoria. Cognee Cloud processes your notes into an interconnected semantic network.",
+      desc: "Upload PDFs, Word documents, PowerPoint slides, or text files directly into StudyMemo. Cognee Cloud processes your notes into an interconnected semantic network.",
       icon: Compass,
       gradient: "from-blue-500/20 to-cyan-500/20",
       iconColor: "text-blue-500",
@@ -40,7 +40,7 @@ function GuidePage() {
     },
     {
       title: "3. Targeted revisions",
-      desc: "Memoria automatically converts your mistakes and weakest concepts into active revision cards. Test yourself regularly to optimize long-term retention.",
+      desc: "StudyMemo automatically converts your mistakes and weakest concepts into active revision cards. Test yourself regularly to optimize long-term retention.",
       icon: Sparkles,
       gradient: "from-emerald-500/20 to-teal-500/20",
       iconColor: "text-emerald-500",
@@ -49,8 +49,8 @@ function GuidePage() {
 
   const faqs = [
     {
-      q: "What makes Memoria different from standard ChatGPT or PDFs chats?",
-      a: "Standard LLMs have short-term memory limits and forget context once a session ends. Memoria runs a persistent cognitive database (powered by Cognee GraphRAG) that links topics across all of your chats.",
+      q: "What makes StudyMemo different from standard ChatGPT or PDFs chats?",
+      a: "Standard LLMs have short-term memory limits and forget context once a session ends. StudyMemo runs a persistent cognitive database (powered by Cognee GraphRAG) that links topics across all of your chats.",
     },
     {
       q: "Which file formats are supported?",
@@ -67,7 +67,7 @@ function GuidePage() {
       <header className="mb-14 text-center max-w-3xl mx-auto">
         <br />
         <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-wide mt-2 text-foreground">
-          How to study with <span className="italic text-primary">Memoria</span>
+          How to study with <span className="italic text-primary">StudyMemo</span>
         </h1>
         <p className="text-[16px] text-muted-foreground mt-4 leading-relaxed">
           Walkthroughs, best practices, and answers to help you organize your study workspace and build persistent cognitive graph memory.
@@ -111,7 +111,7 @@ function GuidePage() {
             Mastering the Chat Console
           </h2>
           <p className="text-[14.5px] text-muted-foreground mt-2 leading-relaxed">
-            Every feature, control, and option inside your Memoria study workspace explained in detail.
+            Every feature, control, and option inside your StudyMemo study workspace explained in detail.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ function GuidePage() {
                   <Cpu className="w-5 h-5 text-primary" /> Cognitive Search Types
                 </h3>
                 <p className="text-[13.5px] text-muted-foreground leading-relaxed mb-6">
-                  Memoria lets you select the exact search algorithm used to scan your notes. Change this option in the sidebar to match your query type:
+                  StudyMemo lets you select the exact search algorithm used to scan your notes. Change this option in the sidebar to match your query type:
                 </p>
                 <ul className="space-y-4">
                   {[
@@ -166,7 +166,7 @@ function GuidePage() {
                 <Database className="w-5 h-5 text-primary" /> Memory Datasets (Namespaces)
               </h3>
               <p className="text-[13.5px] text-muted-foreground leading-relaxed mb-4">
-                Keep different subjects isolated! Memoria namespaces act as database partitions:
+                Keep different subjects isolated! StudyMemo namespaces act as database partitions:
               </p>
               <ul className="space-y-3.5 text-[12.5px] text-muted-foreground leading-relaxed">
                 <li>
@@ -201,6 +201,57 @@ function GuidePage() {
         </div>
       </section>
 
+      {/* Library & Revision Guide */}
+      <section id="library-guide" className="mb-20">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <Badge variant="primary" className="mb-2">Library & Revision Guide</Badge>
+          <h2 className="text-3xl md:text-4xl font-serif font-medium tracking-wide text-foreground">
+            Your Library & Revision Center
+          </h2>
+          <p className="text-[14.5px] text-muted-foreground mt-2 leading-relaxed">
+            Consolidating your knowledge list, spatial memory maps, and flashcard training decks in one unified place.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card className="p-8 flex flex-col justify-between rounded-[2rem] bg-white border border-border">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-500 grid place-items-center mb-6">
+                <Compass className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-serif font-medium text-foreground mb-3">Questions Library</h3>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
+                Every question asked in the Workspace is cataloged here. Use filters to search by Subject, Source (AI vs Past Paper), or check "Verified only" to review high-fidelity notes. Inspect full AI answers inline.
+              </p>
+            </div>
+          </Card>
+
+          <Card className="p-8 flex flex-col justify-between rounded-[2rem] bg-white border border-border">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-500 grid place-items-center mb-6">
+                <Brain className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-serif font-medium text-foreground mb-3">Knowledge Graph</h3>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
+                A visual mapping of your understanding. Check node sizes to identify frequently studied topics. Use pan and zoom controls to navigate, and click node connections to see semantic relations.
+              </p>
+            </div>
+          </Card>
+
+          <Card className="p-8 flex flex-col justify-between rounded-[2rem] bg-white border border-border">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 grid place-items-center mb-6">
+                <RotateCw className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-serif font-medium text-foreground mb-3">Revision Deck</h3>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
+                Custom flashcard drills built from your studies. Filter by subject or topic to study focused cards. Rate your answer accuracy after revealing the answer to update your dashboard streak and metrics.
+              </p>
+            </div>
+          </Card>
+        </div>
+      </section>
+
       {/* Best Practices Section */}
       <section className="py-16 border-y border-border bg-[#FAF7F2]/40 rounded-[3.5rem] px-8 md:px-14 mb-20">
         <div className="grid md:grid-cols-[1fr_1.2fr] gap-12 items-center">
@@ -210,7 +261,7 @@ function GuidePage() {
               Best practices for active recall
             </h2>
             <p className="text-[15px] text-muted-foreground leading-relaxed mb-6">
-              Memoria is designed around cognitive retention. To maximize your study efficiency, we recommend following these methods:
+              StudyMemo is designed around cognitive retention. To maximize your study efficiency, we recommend following these methods:
             </p>
             <Link to="/memo">
               <Button className="rounded-full">

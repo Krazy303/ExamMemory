@@ -40,7 +40,7 @@ import { useAuth } from "@/context/AuthContext";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Memoria — Never Get a Different Answer Twice" },
+      { title: "StudyMemo — Never Get a Different Answer Twice" },
       {
         name: "description",
         content:
@@ -161,7 +161,7 @@ function Hero() {
         <div className="flex-1 text-left relative z-10 w-full">
           <Reveal>
             <div className="text-xs font-semibold tracking-[0.2em] text-primary mb-8 uppercase">
-              [ Memoria ]
+              [ StudyMemo ]
             </div>
           </Reveal>
           <Reveal delay={100}>
@@ -173,7 +173,7 @@ function Hero() {
           </Reveal>
           <Reveal delay={200}>
             <p className="mt-10 text-[17px] text-muted-foreground font-medium max-w-md leading-relaxed">
-              Memoria remembers your notes and mistakes, so every answer is
+              StudyMemo remembers your notes and mistakes, so every answer is
               consistent, source-cited, and truly yours.
             </p>
           </Reveal>
@@ -184,7 +184,7 @@ function Hero() {
                   size="lg"
                   className="shadow-lg hover:shadow-xl rounded-full text-[15px] px-10 h-14 bg-primary text-white font-medium hover:-translate-y-1 transition-all"
                 >
-                  Meet Memo
+                  Meet Memo AI
                 </Button>
               </Link>
               <Link
@@ -267,10 +267,10 @@ function Why() {
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal>
           <SectionHeading
-            eyebrow="Why Memoria"
+            eyebrow="Why StudyMemo"
             title={
               <>
-                What sets Memoria{" "}
+                What sets StudyMemo{" "}
                 <span className="text-primary italic">apart</span>
               </>
             }
@@ -401,9 +401,9 @@ function HowItWorks() {
 function Showcase() {
   const blocks = [
     {
-      eyebrow: "The Memo",
+      eyebrow: "Memo AI",
       title: "Chat that cites its work",
-      desc: "Every answer in Memo pulls from your uploaded material and shows the exact source. No hallucinations, no mystery.",
+      desc: "Every answer in Memo AI pulls from your uploaded material and shows the exact source. No hallucinations, no mystery.",
       icon: MessageSquare,
       img: "images/image.png",
     },
@@ -417,7 +417,7 @@ function Showcase() {
     {
       eyebrow: "Revision Queue",
       title: "Practice the things you miss",
-      desc: "Memoria surfaces the mistakes you keep making and turns them into flashcards. Focused, not random.",
+      desc: "StudyMemo surfaces the mistakes you keep making and turns them into flashcards. Focused, not random.",
       icon: ListChecks,
       img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80",
     },
@@ -449,9 +449,11 @@ function Showcase() {
                 <p className="text-[17px] text-muted-foreground leading-relaxed mb-10 max-w-lg">
                   {b.desc}
                 </p>
-                <Button variant="outline" size="lg" className="rounded-full">
-                  Learn more <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
+                <Link to="/guide">
+                  <Button variant="outline" size="lg" className="rounded-full">
+                    Learn more <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </Reveal>
@@ -537,7 +539,7 @@ function StudentBenefits() {
   const benefits = [
     {
       title: "Save 15+ Hours a Week",
-      desc: "Stop re-reading the same textbook. Memoria directs you straight to the concepts you struggle with.",
+      desc: "Stop re-reading the same textbook. StudyMemo directs you straight to the concepts you struggle with.",
       icon: Zap,
       gradient: "from-blue-500/20 to-cyan-500/20",
       iconColor: "text-blue-500",
@@ -573,7 +575,7 @@ function StudentBenefits() {
         <Reveal>
           <SectionHeading
             eyebrow="Student Benefits"
-            title="How you benefit from using Memoria"
+            title="How you benefit from using StudyMemo"
             center
           />
         </Reveal>
