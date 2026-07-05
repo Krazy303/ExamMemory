@@ -53,11 +53,11 @@ function formatCogneeResponse(results: any, query: string): ChatResponse {
         consistency: { type: "new" },
       };
     }
-    
+
     if (firstResult && typeof firstResult === "object") {
       const rawResult = firstResult.search_result;
       let resultText = "";
-      
+
       if (typeof rawResult === "string") {
         resultText = rawResult;
       } else if (Array.isArray(rawResult)) {
@@ -67,15 +67,19 @@ function formatCogneeResponse(results: any, query: string): ChatResponse {
       } else {
         resultText = JSON.stringify(firstResult);
       }
-      
+
       // Extract sources if reference items are available
       const sources: ChatSource[] = [];
       results.forEach((item: any) => {
-        if (item.dataset_name && item.search_result && item.search_result !== rawResult) {
-          const itemText = Array.isArray(item.search_result) 
-            ? item.search_result.join("\n") 
-            : typeof item.search_result === "string" 
-              ? item.search_result 
+        if (
+          item.dataset_name &&
+          item.search_result &&
+          item.search_result !== rawResult
+        ) {
+          const itemText = Array.isArray(item.search_result)
+            ? item.search_result.join("\n")
+            : typeof item.search_result === "string"
+              ? item.search_result
               : JSON.stringify(item.search_result);
           sources.push({
             name: item.dataset_name,
@@ -87,7 +91,10 @@ function formatCogneeResponse(results: any, query: string): ChatResponse {
       return {
         answer: resultText,
         sources: sources.length > 0 ? sources : undefined,
-        consistency: { type: Math.random() > 0.5 ? "same" : "new", date: "Today" },
+        consistency: {
+          type: Math.random() > 0.5 ? "same" : "new",
+          date: "Today",
+        },
       };
     }
 
@@ -100,7 +107,8 @@ function formatCogneeResponse(results: any, query: string): ChatResponse {
   // If it's a single object
   if (results && typeof results === "object") {
     return {
-      answer: results.search_result || results.answer || JSON.stringify(results),
+      answer:
+        results.search_result || results.answer || JSON.stringify(results),
       sources: results.sources || [],
       consistency: { type: "new" },
     };
@@ -114,7 +122,9 @@ function formatCogneeResponse(results: any, query: string): ChatResponse {
 
 // Server function for searching
 export const cogneeSearch = createServerFn({ method: "POST" })
-  .validator((d: { query: string; datasetName?: string; searchType?: string }) => d)
+  .validator(
+    (d: { query: string; datasetName?: string; searchType?: string }) => d,
+  )
   .handler(async ({ data }) => {
     const datasetName = data.datasetName || "default_dataset";
     const searchType = data.searchType || "GRAPH_COMPLETION";
@@ -124,7 +134,11 @@ export const cogneeSearch = createServerFn({ method: "POST" })
       return {
         answer: `[Mock Mode] This is a mock response because COGNEE_API_KEY is not set.\n\nTo enable real answers grounded in your notes, please set COGNEE_API_KEY in your .env file.\n\nYour query was: "${data.query}"`,
         sources: [
-          { name: "mock_setup_guide.md", excerpt: "To set up Cognee Cloud, create an API key at platform.cognee.ai." }
+          {
+            name: "mock_setup_guide.md",
+            excerpt:
+              "To set up Cognee Cloud, create an API key at platform.cognee.ai.",
+          },
         ],
         consistency: { type: "new" },
         isMock: true,
@@ -145,11 +159,17 @@ export const cogneeSearch = createServerFn({ method: "POST" })
 
       if (!response.ok) {
         const errText = await response.text();
-        if (response.status === 404 || errText.includes("Prerequisites not met") || errText.includes("No datasets found") || errText.includes("DatasetNotFoundError")) {
+        if (
+          response.status === 404 ||
+          errText.includes("Prerequisites not met") ||
+          errText.includes("No datasets found") ||
+          errText.includes("DatasetNotFoundError")
+        ) {
           return {
-            answer: "Welcome to StudyMind! 🚀\n\nYour personal knowledge base is currently empty. To get started, click the **Upload Notes** button at the top right to upload your study files or paste your notes directly. Once uploaded, your material will be indexed and you can ask any questions here!",
+            answer:
+              "Welcome to Memoria! 🚀\n\nYour personal knowledge base is currently empty. To get started, click the **Upload Notes** button at the top right to upload your study files or paste your notes directly. Once uploaded, your material will be indexed and you can ask any questions here!",
             sources: [],
-            consistency: { type: "new" }
+            consistency: { type: "new" },
           };
         }
         throw new Error(`Cognee API error (${response.status}): ${errText}`);
@@ -165,7 +185,9 @@ export const cogneeSearch = createServerFn({ method: "POST" })
 
 // Server function for remember (ingesting text)
 export const cogneeRememberText = createServerFn({ method: "POST" })
-  .validator((d: { text: string; datasetName?: string; fileName?: string }) => d)
+  .validator(
+    (d: { text: string; datasetName?: string; fileName?: string }) => d,
+  )
   .handler(async ({ data }) => {
     const datasetName = data.datasetName || "default_dataset";
     const fileName = data.fileName || "note.txt";
@@ -208,6 +230,59 @@ export const cogneeRememberText = createServerFn({ method: "POST" })
     }
   });
 
+export const cogneeRememberFile = createServerFn({ method: "POST" })
+  .validator(
+    (d: {
+      base64Data: string;
+      datasetName?: string;
+      fileName?: string;
+      mimeType: string;
+    }) => d,
+  )
+  .handler(async ({ data }) => {
+    const datasetName = data.datasetName || "default_dataset";
+    const fileName = data.fileName || "document.pdf";
+
+    if (!COGNEE_API_KEY) {
+      console.warn("COGNEE_API_KEY is not set. Ingesting in mock mode.");
+      return { isMock: true, success: true };
+    }
+
+    try {
+      const buffer = Buffer.from(data.base64Data, "base64");
+      const blob = new Blob([buffer], { type: data.mimeType });
+
+      const formData = new FormData();
+      formData.append("data", blob, fileName);
+      formData.append("datasetName", datasetName);
+      formData.append("run_in_background", "false");
+
+      const headers: Record<string, string> = {
+        "X-Api-Key": COGNEE_API_KEY,
+      };
+      if (COGNEE_TENANT_ID) {
+        headers["X-Tenant-Id"] = COGNEE_TENANT_ID;
+      }
+
+      const response = await fetch(`${COGNEE_API_URL}/api/v1/remember`, {
+        method: "POST",
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Cognee API error (${response.status}): ${errText}`);
+      }
+
+      const resJson = await response.json();
+      return { isMock: false, success: true, response: resJson };
+    } catch (error: any) {
+      console.error("Error in cogneeRememberFile server function:", error);
+      throw error;
+    }
+  });
+
 // Server function for get graph
 export const cogneeGetGraph = createServerFn({ method: "GET" })
   .validator((d: { datasetName?: string }) => d)
@@ -241,7 +316,9 @@ export const cogneeGetGraph = createServerFn({ method: "GET" })
 
       if (!listResponse.ok) {
         const errText = await listResponse.text();
-        throw new Error(`Cognee API error listing datasets (${listResponse.status}): ${errText}`);
+        throw new Error(
+          `Cognee API error listing datasets (${listResponse.status}): ${errText}`,
+        );
       }
 
       const datasets = await listResponse.json();
@@ -256,24 +333,33 @@ export const cogneeGetGraph = createServerFn({ method: "GET" })
       if (!dataset) {
         return {
           nodes: [
-            { id: "empty", label: "Upload notes to build your mind map!", type: "concept" }
+            {
+              id: "empty",
+              label: "Upload notes to build your mind map!",
+              type: "concept",
+            },
           ],
           edges: [],
-          message: "No datasets found."
+          message: "No datasets found.",
         };
       }
 
       const datasetId = dataset.id;
 
       // 2. Fetch the graph
-      const graphResponse = await fetch(`${COGNEE_API_URL}/api/v1/datasets/${datasetId}/graph`, {
-        method: "GET",
-        headers: getHeaders(),
-      });
+      const graphResponse = await fetch(
+        `${COGNEE_API_URL}/api/v1/datasets/${datasetId}/graph`,
+        {
+          method: "GET",
+          headers: getHeaders(),
+        },
+      );
 
       if (!graphResponse.ok) {
         const errText = await graphResponse.text();
-        throw new Error(`Cognee API error fetching graph (${graphResponse.status}): ${errText}`);
+        throw new Error(
+          `Cognee API error fetching graph (${graphResponse.status}): ${errText}`,
+        );
       }
 
       return await graphResponse.json();
@@ -303,7 +389,8 @@ function formatTimeAgo(dateString: string): string {
 export const cogneeGetDashboardData = createServerFn({ method: "GET" })
   .validator((d: { datasetName?: string }) => d)
   .handler(async ({ data }) => {
-    const datasetName = data.validator?.datasetName || data.datasetName || "default_dataset";
+    const datasetName =
+      data.validator?.datasetName || data.datasetName || "default_dataset";
 
     if (!COGNEE_API_KEY) {
       return { isMock: true };
@@ -326,21 +413,24 @@ export const cogneeGetDashboardData = createServerFn({ method: "GET" })
       if (listResponse.ok) {
         const datasets = await listResponse.json();
         datasetsCount = datasets.length;
-        
+
         let dataset = datasets.find((d: any) => d.name === datasetName);
         if (!dataset && datasets.length > 0) {
           dataset = datasets[0];
         }
-        
+
         if (dataset) {
           const datasetId = dataset.id;
-          
+
           // 2. Fetch Data items count
           try {
-            const dataResponse = await fetch(`${COGNEE_API_URL}/api/v1/datasets/${datasetId}/data`, {
-              method: "GET",
-              headers: getHeaders(),
-            });
+            const dataResponse = await fetch(
+              `${COGNEE_API_URL}/api/v1/datasets/${datasetId}/data`,
+              {
+                method: "GET",
+                headers: getHeaders(),
+              },
+            );
             if (dataResponse.ok) {
               const items = await dataResponse.json();
               dataItemsCount = Array.isArray(items) ? items.length : 0;
@@ -351,36 +441,48 @@ export const cogneeGetDashboardData = createServerFn({ method: "GET" })
 
           // 3. Fetch Graph and concepts mapping
           try {
-            const graphResponse = await fetch(`${COGNEE_API_URL}/api/v1/datasets/${datasetId}/graph`, {
-              method: "GET",
-              headers: getHeaders(),
-            });
+            const graphResponse = await fetch(
+              `${COGNEE_API_URL}/api/v1/datasets/${datasetId}/graph`,
+              {
+                method: "GET",
+                headers: getHeaders(),
+              },
+            );
             if (graphResponse.ok) {
               const graphData = await graphResponse.json();
-              conceptsMappedCount = graphData && graphData.nodes ? graphData.nodes.length : 0;
-              
+              conceptsMappedCount =
+                graphData && graphData.nodes ? graphData.nodes.length : 0;
+
               if (graphData && Array.isArray(graphData.nodes)) {
                 // filter out document nodes, keep entities
-                const entities = graphData.nodes.filter((n: any) => n.type !== "TextDocument");
-                
+                const entities = graphData.nodes.filter(
+                  (n: any) => n.type !== "TextDocument",
+                );
+
                 // Build dynamic weak concepts
-                weakConceptsRes = entities.slice(0, 4).map((n: any, idx: number) => ({
-                  concept: n.label,
-                  subject: "General Study",
-                  severity: idx % 3 === 0 ? "high" : idx % 3 === 1 ? "medium" : "low"
-                }));
-                
+                weakConceptsRes = entities
+                  .slice(0, 4)
+                  .map((n: any, idx: number) => ({
+                    concept: n.label,
+                    subject: "General Study",
+                    severity:
+                      idx % 3 === 0 ? "high" : idx % 3 === 1 ? "medium" : "low",
+                  }));
+
                 // Build dynamic syllabus coverage
-                const coveragePct = Math.min(100, Math.max(10, entities.length * 8));
+                const coveragePct = Math.min(
+                  100,
+                  Math.max(10, entities.length * 8),
+                );
                 syllabusCoverageRes = [
                   {
                     subject: "General Study",
                     pct: coveragePct,
                     chapters: entities.slice(0, 4).map((n: any) => ({
                       name: n.label,
-                      pct: Math.min(100, 25 + Math.floor(Math.random() * 70))
-                    }))
-                  }
+                      pct: Math.min(100, 25 + Math.floor(Math.random() * 70)),
+                    })),
+                  },
                 ];
               }
             }
@@ -419,7 +521,7 @@ export const cogneeGetDashboardData = createServerFn({ method: "GET" })
         });
       });
     }
-    
+
     // Sort recent activity descending
     activities.sort((a, b) => b.timestamp - a.timestamp);
 
@@ -428,21 +530,42 @@ export const cogneeGetDashboardData = createServerFn({ method: "GET" })
     return {
       isMock: false,
       stats: [
-        { label: "Study Streak", value: searchHistoryCount > 0 ? "5" : "0", suffix: "days", icon: "flame" },
-        { label: "Questions Asked", value: String(searchHistoryCount), suffix: "this week", icon: "message" },
-        { label: "Topics Covered", value: `${coveragePct}%`, suffix: "of syllabus", icon: "book" },
-        { label: "Concepts Mapped", value: String(conceptsMappedCount), suffix: "nodes in graph", icon: "alert" },
+        {
+          label: "Study Streak",
+          value: searchHistoryCount > 0 ? "5" : "0",
+          suffix: "days",
+          icon: "flame",
+        },
+        {
+          label: "Questions Asked",
+          value: String(searchHistoryCount),
+          suffix: "this week",
+          icon: "message",
+        },
+        {
+          label: "Topics Covered",
+          value: `${coveragePct}%`,
+          suffix: "of syllabus",
+          icon: "book",
+        },
+        {
+          label: "Concepts Mapped",
+          value: String(conceptsMappedCount),
+          suffix: "nodes in graph",
+          icon: "alert",
+        },
       ],
       recentActivity: activities.slice(0, 5),
-      syllabusCoverage: syllabusCoverageRes.length > 0 ? syllabusCoverageRes : null,
+      syllabusCoverage:
+        syllabusCoverageRes.length > 0 ? syllabusCoverageRes : null,
       weakConcepts: weakConceptsRes.length > 0 ? weakConceptsRes : null,
       conceptsMappedCount,
       dataItemsCount,
     };
   });
 
-export const cogneeGetQuestions = createServerFn({ method: "GET" })
-  .handler(async () => {
+export const cogneeGetQuestions = createServerFn({ method: "GET" }).handler(
+  async () => {
     if (!COGNEE_API_KEY) {
       return { isMock: true, questions: [] };
     }
@@ -465,7 +588,8 @@ export const cogneeGetQuestions = createServerFn({ method: "GET" })
       const mappedQuestions = history.map((item: any, i: number) => ({
         id: item.id || String(i),
         question: item.text,
-        answer: "Use the 'Memo' tab to query this concept again for a fresh response.",
+        answer:
+          "Use the 'Memo' tab to query this concept again for a fresh response.",
         subject: "General",
         chapter: "Searches",
         source: "Search History",
@@ -477,46 +601,48 @@ export const cogneeGetQuestions = createServerFn({ method: "GET" })
     } catch {
       return { isMock: true, questions: [] };
     }
-  });
+  },
+);
 
-export const cogneeGetMemoSidebarData = createServerFn({ method: "GET" })
-  .handler(async () => {
-    if (!COGNEE_API_KEY) {
-      return { isMock: true };
+export const cogneeGetMemoSidebarData = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  if (!COGNEE_API_KEY) {
+    return { isMock: true };
+  }
+  try {
+    const listResponse = await fetch(`${COGNEE_API_URL}/api/v1/datasets`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+    let datasets = [];
+    if (listResponse.ok) {
+      datasets = await listResponse.json();
     }
-    try {
-      const listResponse = await fetch(`${COGNEE_API_URL}/api/v1/datasets`, {
-        method: "GET",
-        headers: getHeaders(),
-      });
-      let datasets = [];
-      if (listResponse.ok) {
-        datasets = await listResponse.json();
-      }
 
-      const historyResponse = await fetch(`${COGNEE_API_URL}/api/v1/search`, {
-        method: "GET",
-        headers: getHeaders(),
-      });
-      let history = [];
-      if (historyResponse.ok) {
-        history = await historyResponse.json();
-      }
-
-      return {
-        isMock: false,
-        datasets: datasets.map((d: any) => ({ id: d.id, name: d.name })),
-        recentQueries: history.slice(0, 10).map((h: any) => ({
-          id: h.id,
-          title: h.text,
-          updated: formatTimeAgo(h.createdAt),
-        })),
-      };
-    } catch (err) {
-      console.error(err);
-      return { isMock: true };
+    const historyResponse = await fetch(`${COGNEE_API_URL}/api/v1/search`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+    let history = [];
+    if (historyResponse.ok) {
+      history = await historyResponse.json();
     }
-  });
+
+    return {
+      isMock: false,
+      datasets: datasets.map((d: any) => ({ id: d.id, name: d.name })),
+      recentQueries: history.slice(0, 10).map((h: any) => ({
+        id: h.id,
+        title: h.text,
+        updated: formatTimeAgo(h.createdAt),
+      })),
+    };
+  } catch (err) {
+    console.error(err);
+    return { isMock: true };
+  }
+});
 
 export const cogneeGetDatasetFiles = createServerFn({ method: "GET" })
   .validator((d: { datasetName?: string }) => d)
@@ -535,19 +661,24 @@ export const cogneeGetDatasetFiles = createServerFn({ method: "GET" })
       const dataset = datasets.find((d: any) => d.name === datasetName);
       if (!dataset) return { isMock: false, files: [] };
 
-      const dataResponse = await fetch(`${COGNEE_API_URL}/api/v1/datasets/${dataset.id}/data`, {
-        method: "GET",
-        headers: getHeaders(),
-      });
+      const dataResponse = await fetch(
+        `${COGNEE_API_URL}/api/v1/datasets/${dataset.id}/data`,
+        {
+          method: "GET",
+          headers: getHeaders(),
+        },
+      );
       if (!dataResponse.ok) return { isMock: false, files: [] };
       const items = await dataResponse.json();
       return {
         isMock: false,
-        files: Array.isArray(items) ? items.map((item: any) => ({
-          id: item.id || item.name,
-          name: item.name || "Unnamed File",
-          createdAt: formatTimeAgo(item.createdAt || new Date()),
-        })) : []
+        files: Array.isArray(items)
+          ? items.map((item: any) => ({
+              id: item.id || item.name,
+              name: item.name || "Unnamed File",
+              createdAt: formatTimeAgo(item.createdAt || new Date()),
+            }))
+          : [],
       };
     } catch (err) {
       console.error(err);
@@ -572,31 +703,35 @@ export const cogneeGetTimelineData = createServerFn({ method: "GET" })
       }
 
       const items: any[] = [];
-      
+
       if (Array.isArray(searchHistory)) {
         searchHistory.forEach((h: any) => {
           let queryText = h.text || "";
-          
+
           // 1. Filter out internal AI summaries
           if (queryText.startsWith("Summarize this text into")) return;
-          
+
           // 2. Filter out raw logged search result arrays
           if (queryText.startsWith("[") || queryText.startsWith("[[")) return;
-          
+
           // 3. Strip out internal prompt styling instructions
           const styleIndex = queryText.indexOf("\n\nStyle instruction:");
           if (styleIndex !== -1) {
             queryText = queryText.slice(0, styleIndex).trim();
           }
-          
+
           if (!queryText.trim()) return;
 
           const date = new Date(h.createdAt);
           const todayDate = new Date();
           const yesterdayDate = new Date();
           yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-          
-          let dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+          let dateStr = date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
           if (date.toDateString() === todayDate.toDateString()) {
             dateStr = "Today";
           } else if (date.toDateString() === yesterdayDate.toDateString()) {
@@ -610,7 +745,10 @@ export const cogneeGetTimelineData = createServerFn({ method: "GET" })
             desc: "Queried the knowledge base via Study Workspace.",
             icon: "message",
             subject: "General",
-            time: date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+            time: date.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            }),
             consistency: "new",
           });
         });
@@ -641,7 +779,8 @@ export const cogneeGetTimelineData = createServerFn({ method: "GET" })
 export const cogneeSummarizeText = createServerFn({ method: "POST" })
   .validator((d: { text: string; datasetName?: string }) => d)
   .handler(async ({ data }) => {
-    const datasetName = data.validator?.datasetName || data.datasetName || "default_dataset";
+    const datasetName =
+      data.validator?.datasetName || data.datasetName || "default_dataset";
     if (!COGNEE_API_KEY) {
       return { summary: data.text };
     }
@@ -653,7 +792,8 @@ export const cogneeSummarizeText = createServerFn({ method: "POST" })
       let datasetId = "";
       if (listResponse.ok) {
         const datasets = await listResponse.json();
-        const dataset = datasets.find((d: any) => d.name === datasetName) || datasets[0];
+        const dataset =
+          datasets.find((d: any) => d.name === datasetName) || datasets[0];
         if (dataset) datasetId = dataset.id;
       }
 
@@ -671,7 +811,7 @@ export const cogneeSummarizeText = createServerFn({ method: "POST" })
         const resData = await response.json();
         const formatted = formatCogneeResponse(resData, "summarize");
         let answer = formatted.answer || "";
-        
+
         const evidenceIndex = answer.search(/(?:Evidence|evidence):/i);
         if (evidenceIndex !== -1) {
           answer = answer.slice(0, evidenceIndex).trim();
@@ -709,10 +849,13 @@ export const cogneeDeleteDataset = createServerFn({ method: "POST" })
         throw new Error(`Subject "${datasetName}" not found`);
       }
 
-      const deleteResponse = await fetch(`${COGNEE_API_URL}/api/v1/datasets/${datasetId}`, {
-        method: "DELETE",
-        headers: getHeaders(),
-      });
+      const deleteResponse = await fetch(
+        `${COGNEE_API_URL}/api/v1/datasets/${datasetId}`,
+        {
+          method: "DELETE",
+          headers: getHeaders(),
+        },
+      );
 
       if (!deleteResponse.ok) {
         const errText = await deleteResponse.text();
