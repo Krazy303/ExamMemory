@@ -66,7 +66,7 @@ const welcomeMessage: ChatMessage[] = [
   {
     id: "welcome",
     role: "ai",
-    text: "Welcome to your StudyMemo Workspace! 🚀\n\nI am your persistent-memory AI study companion powered by Cognee Cloud. I can analyze and answer complex queries grounded in the files you upload.\n\n### How to get started:\n1. Click the **Upload Notes** button in the sidebar or below to index some study files (PDFs, TXT, MD) into memory.\n2. Choose your **Memory Dataset** and **Search Type** in the sidebar.\n3. Type your question in the chat box to search!",
+    text: "Welcome to **Memo AI** — your persistent-memory AI study companion! 🚀\n\nI'm powered by Cognee Cloud and can analyze and answer complex queries grounded in the files you upload.\n\n### How to get started:\n1. Click the **Upload Notes** button in the sidebar or below to index some study files (PDFs, TXT, MD) into memory.\n2. Choose your **Memory Dataset** and **Search Type** in the sidebar.\n3. Type your question in the chat box to search!",
   },
 ];
 

@@ -184,7 +184,7 @@ function Hero() {
                   size="lg"
                   className="shadow-lg hover:shadow-xl rounded-full text-[15px] px-10 h-14 bg-primary text-white font-medium hover:-translate-y-1 transition-all"
                 >
-                  Meet Memo
+                  Meet Memo AI
                 </Button>
               </Link>
               <Link
@@ -401,9 +401,9 @@ function HowItWorks() {
 function Showcase() {
   const blocks = [
     {
-      eyebrow: "The Memo",
+      eyebrow: "Memo AI",
       title: "Chat that cites its work",
-      desc: "Every answer in Memo pulls from your uploaded material and shows the exact source. No hallucinations, no mystery.",
+      desc: "Every answer in Memo AI pulls from your uploaded material and shows the exact source. No hallucinations, no mystery.",
       icon: MessageSquare,
       img: "images/image.png",
     },
