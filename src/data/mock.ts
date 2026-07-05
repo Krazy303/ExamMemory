@@ -1,4 +1,4 @@
-// All demo data for Memoria. Replace with real API responses later.
+// All demo data for StudyMemo. Replace with real API responses later.
 
 export const student = {
   name: "Alex Chen",
@@ -201,7 +201,7 @@ export const pricing = [
 
 export const faq = [
   {
-    q: "How does Memoria's memory actually work?",
+    q: "How does StudyMemo's memory actually work?",
     a: "Every question, note, and past paper you upload becomes part of a personal knowledge graph. Answers are grounded in that graph, so the same question always returns a consistent, source-cited answer.",
   },
   {
@@ -222,7 +222,7 @@ export const faq = [
   },
   {
     q: "Does it replace my teacher?",
-    a: "No — it augments them. Memoria is a memory-powered study companion, not a substitute for classroom learning or human feedback.",
+    a: "No — it augments them. StudyMemo is a memory-powered study companion, not a substitute for classroom learning or human feedback.",
   },
 ];
 
@@ -666,7 +666,7 @@ export const howItWorks = [
   {
     n: "02",
     title: "Ask in Memo",
-    desc: "Chat naturally. Memoria pulls from your material, not the open web.",
+    desc: "Chat naturally. StudyMemo pulls from your material, not the open web.",
   },
   {
     n: "03",

@@ -42,11 +42,11 @@ import { supabase } from "@/lib/supabase";
 export const Route = createFileRoute("/memo")({
   head: () => ({
     meta: [
-      { title: "Workspace — Memoria" },
+      { title: "Workspace — StudyMemo" },
       {
         name: "description",
         content:
-          "Chat with Memoria. Every answer is grounded in your own notes and past papers.",
+          "Chat with StudyMemo. Every answer is grounded in your own notes and past papers.",
       },
     ],
   }),
@@ -66,7 +66,7 @@ const welcomeMessage: ChatMessage[] = [
   {
     id: "welcome",
     role: "ai",
-    text: "Welcome to your Memoria Workspace! 🚀\n\nI am your persistent-memory AI study companion powered by Cognee Cloud. I can analyze and answer complex queries grounded in the files you upload.\n\n### How to get started:\n1. Click the **Upload Notes** button in the sidebar or below to index some study files (PDFs, TXT, MD) into memory.\n2. Choose your **Memory Dataset** and **Search Type** in the sidebar.\n3. Type your question in the chat box to search!",
+    text: "Welcome to your StudyMemo Workspace! 🚀\n\nI am your persistent-memory AI study companion powered by Cognee Cloud. I can analyze and answer complex queries grounded in the files you upload.\n\n### How to get started:\n1. Click the **Upload Notes** button in the sidebar or below to index some study files (PDFs, TXT, MD) into memory.\n2. Choose your **Memory Dataset** and **Search Type** in the sidebar.\n3. Type your question in the chat box to search!",
   },
 ];
 
@@ -142,9 +142,42 @@ function MemoPage() {
         if (!hasActive) {
           setSelectedDataset(res.datasets[0].name);
         }
+      } else {
+        // Fallback for mock mode
+        const savedMockSubjects = localStorage.getItem("studymemo_mock_subjects");
+        if (savedMockSubjects) {
+          try {
+            const subjects = JSON.parse(savedMockSubjects);
+            if (Array.isArray(subjects)) {
+              const formattedList = [
+                { id: "default_dataset", name: "default_dataset" },
+                ...subjects.map((sub: string) => ({ id: sub, name: sub }))
+              ];
+              setDatasetsList(formattedList);
+              return;
+            }
+          } catch (e) {
+            console.error("Error parsing mock subjects:", e);
+          }
+        }
+        setDatasetsList([{ id: "default_dataset", name: "default_dataset" }]);
       }
     } catch (err) {
       console.error("Failed to load datasets:", err);
+      const savedMockSubjects = localStorage.getItem("studymemo_mock_subjects");
+      if (savedMockSubjects) {
+        try {
+          const subjects = JSON.parse(savedMockSubjects);
+          if (Array.isArray(subjects)) {
+            setDatasetsList([
+              { id: "default_dataset", name: "default_dataset" },
+              ...subjects.map((sub: string) => ({ id: sub, name: sub }))
+            ]);
+            return;
+          }
+        } catch {}
+      }
+      setDatasetsList([{ id: "default_dataset", name: "default_dataset" }]);
     }
   };
 
@@ -174,10 +207,33 @@ function MemoPage() {
       if (res && !res.isMock && res.files) {
         setDatasetFiles(res.files);
       } else {
+        // Fallback for mock mode
+        const savedMockFiles = localStorage.getItem("studymemo_mock_files");
+        if (savedMockFiles) {
+          try {
+            const files = JSON.parse(savedMockFiles);
+            if (Array.isArray(files)) {
+              const filtered = files.filter((f: any) => f.datasetName === datasetName);
+              setDatasetFiles(filtered);
+              return;
+            }
+          } catch {}
+        }
         setDatasetFiles([]);
       }
     } catch (err) {
       console.error("Failed to fetch dataset files:", err);
+      const savedMockFiles = localStorage.getItem("studymemo_mock_files");
+      if (savedMockFiles) {
+        try {
+          const files = JSON.parse(savedMockFiles);
+          if (Array.isArray(files)) {
+            setDatasetFiles(files.filter((f: any) => f.datasetName === datasetName));
+            return;
+          }
+        } catch {}
+      }
+      setDatasetFiles([]);
     } finally {
       setFilesLoading(false);
     }
@@ -704,7 +760,7 @@ function MemoPage() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-[13px] font-medium truncate text-foreground">
-                {user?.user_metadata?.full_name || "Memoria User"}
+                {user?.user_metadata?.full_name || "StudyMemo User"}
               </div>
               <div className="text-[10px] text-muted-foreground truncate">
                 {user?.email}
@@ -1025,6 +1081,19 @@ function MemoPage() {
                           mimeType: file.type || "application/octet-stream",
                         },
                       });
+
+                      // Update local storage mock database
+                      const savedMockFiles = localStorage.getItem("studymemo_mock_files");
+                      const files = savedMockFiles ? JSON.parse(savedMockFiles) : [];
+                      files.push({
+                        id: `file-${Date.now()}`,
+                        name: file.name,
+                        datasetName: selectedDataset,
+                        createdAt: "Just now",
+                        timestamp: Date.now()
+                      });
+                      localStorage.setItem("studymemo_mock_files", JSON.stringify(files));
+
                       alert(
                         `Successfully uploaded "${file.name}" to "${selectedDataset}"!`,
                       );
@@ -1093,6 +1162,19 @@ function MemoPage() {
                       fileName: "pasted_note.txt",
                     },
                   });
+
+                  // Update local storage mock database
+                  const savedMockFiles = localStorage.getItem("studymemo_mock_files");
+                  const files = savedMockFiles ? JSON.parse(savedMockFiles) : [];
+                  files.push({
+                    id: `file-${Date.now()}`,
+                    name: "pasted_note.txt",
+                    datasetName: selectedDataset,
+                    createdAt: "Just now",
+                    timestamp: Date.now()
+                  });
+                  localStorage.setItem("studymemo_mock_files", JSON.stringify(files));
+
                   alert(`Successfully uploaded notes to "${selectedDataset}"!`);
                   textarea.value = "";
 
@@ -1181,6 +1263,26 @@ function MemoPage() {
                       fileName: "welcome_init.txt",
                     },
                   });
+
+                  // Save to localStorage subjects list
+                  const savedMockSubjects = localStorage.getItem("studymemo_mock_subjects");
+                  const subjects = savedMockSubjects ? JSON.parse(savedMockSubjects) : [];
+                  if (!subjects.includes(formattedName)) {
+                    subjects.push(formattedName);
+                    localStorage.setItem("studymemo_mock_subjects", JSON.stringify(subjects));
+                  }
+
+                  // Save welcome init file to localStorage files list
+                  const savedMockFiles = localStorage.getItem("studymemo_mock_files");
+                  const files = savedMockFiles ? JSON.parse(savedMockFiles) : [];
+                  files.push({
+                    id: `file-${Date.now()}`,
+                    name: "welcome_init.txt",
+                    datasetName: formattedName,
+                    createdAt: "Just now",
+                    timestamp: Date.now()
+                  });
+                  localStorage.setItem("studymemo_mock_files", JSON.stringify(files));
 
                   setDatasetsList((prev) => {
                     if (prev.some((d) => d.name === formattedName)) return prev;

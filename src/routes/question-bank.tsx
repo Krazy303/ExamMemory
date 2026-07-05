@@ -34,7 +34,7 @@ export type GraphNode = {
 export const Route = createFileRoute("/question-bank")({
   head: () => ({
     meta: [
-      { title: "Library — Memoria" },
+      { title: "Library — StudyMemo" },
       {
         name: "description",
         content:
@@ -593,7 +593,7 @@ function QuestionBankPage() {
               </div>
               <h2 className="text-2xl font-semibold mb-2">Knowledge Graph is empty</h2>
               <p className="text-[color:var(--link)] text-[13px] mb-8 max-w-sm mx-auto leading-relaxed">
-                Upload notes and chat with Memoria in the Workspace. Your study concepts and files will automatically link together to build a visual knowledge graph!
+                Upload notes and chat with StudyMemo in the Workspace. Your study concepts and files will automatically link together to build a visual knowledge graph!
               </p>
               <Link to="/memo">
                 <Button size="lg" className="rounded-full">Go to Study Workspace</Button>
@@ -817,7 +817,7 @@ function QuestionBankPage() {
               </div>
               <h2 className="text-2xl font-semibold mb-2">No flashcards available yet</h2>
               <p className="text-[color:var(--link)] text-[13px] mb-8 max-w-sm mx-auto leading-relaxed">
-                Upload notes and chat with Memoria in the Workspace. Your study questions and AI answers will automatically show up here as a custom revision deck!
+                Upload notes and chat with StudyMemo in the Workspace. Your study questions and AI answers will automatically show up here as a custom revision deck!
               </p>
               <Link to="/memo">
                 <Button size="lg" className="rounded-full">Go to Study Workspace</Button>

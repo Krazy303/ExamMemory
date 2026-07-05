@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Memoria" },
+      { title: "Dashboard — StudyMemo" },
       { name: "description", content: "Track your streak, syllabus coverage, and weak concepts at a glance." },
     ],
   }),
@@ -152,10 +152,38 @@ function Dashboard() {
   useEffect(() => {
     try {
       const savedThreads = localStorage.getItem("studymind_chat_threads");
+      const savedMockSubjects = localStorage.getItem("studymemo_mock_subjects");
+      const savedMockFiles = localStorage.getItem("studymemo_mock_files");
+      
       let totalQuestions = 0;
       const uniqueSubjects = new Set<string>();
       const activities: any[] = [];
       const weakList: any[] = [];
+
+      // Add default subject
+      uniqueSubjects.add("default_dataset");
+
+      if (savedMockSubjects) {
+        try {
+          const subs = JSON.parse(savedMockSubjects);
+          if (Array.isArray(subs)) {
+            subs.forEach((sub: string) => uniqueSubjects.add(sub));
+          }
+        } catch {}
+      }
+
+      if (savedMockFiles) {
+        try {
+          const fList = JSON.parse(savedMockFiles);
+          if (Array.isArray(fList)) {
+            fList.forEach((f: any) => {
+              if (f.datasetName) {
+                uniqueSubjects.add(f.datasetName);
+              }
+            });
+          }
+        } catch {}
+      }
 
       if (savedThreads) {
         const threads = JSON.parse(savedThreads);
@@ -192,11 +220,40 @@ function Dashboard() {
         }
       }
 
-      const activeStreak = "0";
+      // Calculate active study streak dynamically
+      let activeStreak = 0;
+      if (savedThreads) {
+        const threads = JSON.parse(savedThreads);
+        if (Array.isArray(threads) && threads.length > 0) {
+          const uniqueDates = new Set<string>();
+          threads.forEach((t: any) => {
+            const d = new Date(t.updatedAt || Date.now());
+            uniqueDates.add(d.toDateString());
+          });
+
+          let currentDay = new Date();
+          while (true) {
+            if (uniqueDates.has(currentDay.toDateString())) {
+              activeStreak++;
+              currentDay.setDate(currentDay.getDate() - 1);
+            } else {
+              if (activeStreak === 0) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                if (uniqueDates.has(yesterday.toDateString())) {
+                  currentDay = yesterday;
+                  continue;
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
 
       // Dynamic stats structure
       setStats([
-        { label: "Study Streak", value: activeStreak, suffix: "days", icon: "flame" },
+        { label: "Study Streak", value: activeStreak.toString(), suffix: "days", icon: "flame" },
         { label: "Questions Asked", value: totalQuestions.toString(), suffix: "asked", icon: "message" },
         { label: "Topics Covered", value: uniqueSubjects.size > 0 ? `${Math.min(uniqueSubjects.size * 25, 100)}%` : "0%", suffix: "completed", icon: "book" },
         { label: "Mistakes Tracked", value: weakList.length.toString(), suffix: "active", icon: "alert" },
@@ -209,6 +266,23 @@ function Dashboard() {
           name: t.title || "Untitled Topic",
           pct: t.messages.length > 3 ? 100 : 50,
         }));
+
+        if (savedMockFiles) {
+          try {
+            const fList = JSON.parse(savedMockFiles);
+            if (Array.isArray(fList)) {
+              fList.filter((f: any) => f.datasetName === sub).forEach((f: any) => {
+                if (!chapters.some(c => c.name === f.name)) {
+                  chapters.push({
+                    name: f.name,
+                    pct: 100
+                  });
+                }
+              });
+            }
+          } catch {}
+        }
+
         const avgPct = chapters.length > 0
           ? Math.round(chapters.reduce((sum: number, c: any) => sum + c.pct, 0) / chapters.length)
           : 0;
@@ -243,10 +317,26 @@ function Dashboard() {
       if (res && !res.isMock && res.files) {
         setFiles(res.files);
       } else {
+        // Fallback to localStorage mock files
+        const savedMockFiles = localStorage.getItem("studymemo_mock_files");
+        if (savedMockFiles) {
+          try {
+            const parsed = JSON.parse(savedMockFiles);
+            setFiles(parsed);
+            return;
+          } catch {}
+        }
         setFiles([]);
       }
     } catch (err) {
       console.error("Failed to load dataset files in dashboard:", err);
+      const savedMockFiles = localStorage.getItem("studymemo_mock_files");
+      if (savedMockFiles) {
+        try {
+          setFiles(JSON.parse(savedMockFiles));
+          return;
+        } catch {}
+      }
       setFiles([]);
     } finally {
       setFilesLoading(false);
@@ -664,8 +754,8 @@ function Dashboard() {
                     onChange={(e) => setAiModel(e.target.value)}
                     className="w-full bg-[#FAF7F2] border border-border rounded-xl px-3 py-2.5 text-[13.5px] focus:outline-none focus:border-primary/50 cursor-pointer font-medium"
                   >
-                    <option value="standard">Memoria Standard (Fast)</option>
-                    <option value="pro">Memoria Pro (Complex Queries)</option>
+                    <option value="standard">StudyMemo Standard (Fast)</option>
+                    <option value="pro">StudyMemo Pro (Complex Queries)</option>
                   </select>
                 </div>
               </div>

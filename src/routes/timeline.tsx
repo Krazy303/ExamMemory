@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/timeline")({
   head: () => ({
     meta: [
-      { title: "Timeline — Memoria" },
+      { title: "Timeline — StudyMemo" },
       {
         name: "description",
         content:
@@ -39,6 +39,7 @@ function TimelinePage() {
   useEffect(() => {
     try {
       const savedThreads = localStorage.getItem("studymind_chat_threads");
+      const savedMockFiles = localStorage.getItem("studymemo_mock_files");
       const localGroups: any[] = [];
       const rawItems: any[] = [];
 
@@ -75,6 +76,36 @@ function TimelinePage() {
             });
           });
         }
+      }
+
+      if (savedMockFiles) {
+        try {
+          const files = JSON.parse(savedMockFiles);
+          if (Array.isArray(files)) {
+            files.forEach((f: any) => {
+              const fileDate = f.timestamp ? new Date(f.timestamp) : new Date();
+              const dateStr = fileDate.toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              });
+              const timeStr = fileDate.toLocaleTimeString(undefined, {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+              rawItems.push({
+                date: dateStr,
+                time: timeStr,
+                icon: "upload",
+                title: `Indexed File: "${f.name}"`,
+                desc: `Successfully added to subject: ${f.datasetName || "default_dataset"}`,
+                subject: f.datasetName || "default_dataset",
+                consistency: "new",
+                timestamp: f.timestamp || Date.now(),
+              });
+            });
+          }
+        } catch {}
       }
 
       // Sort raw items by timestamp descending
@@ -120,7 +151,7 @@ function TimelinePage() {
           </div>
           <h2 className="text-2xl font-semibold mb-2">No study history yet</h2>
           <p className="text-[color:var(--link)] text-[13px] mb-8 max-w-sm mx-auto leading-relaxed">
-            Upload notes and chat with Memoria in the Workspace. Every study question, upload, and revision will be logged here chronologically.
+            Upload notes and chat with StudyMemo in the Workspace. Every study question, upload, and revision will be logged here chronologically.
           </p>
           <Link to="/memo">
             <Button size="lg" className="rounded-full">Go to Study Workspace</Button>

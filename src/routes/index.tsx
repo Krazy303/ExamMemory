@@ -40,7 +40,7 @@ import { useAuth } from "@/context/AuthContext";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Memoria — Never Get a Different Answer Twice" },
+      { title: "StudyMemo — Never Get a Different Answer Twice" },
       {
         name: "description",
         content:
@@ -161,7 +161,7 @@ function Hero() {
         <div className="flex-1 text-left relative z-10 w-full">
           <Reveal>
             <div className="text-xs font-semibold tracking-[0.2em] text-primary mb-8 uppercase">
-              [ Memoria ]
+              [ StudyMemo ]
             </div>
           </Reveal>
           <Reveal delay={100}>
@@ -173,7 +173,7 @@ function Hero() {
           </Reveal>
           <Reveal delay={200}>
             <p className="mt-10 text-[17px] text-muted-foreground font-medium max-w-md leading-relaxed">
-              Memoria remembers your notes and mistakes, so every answer is
+              StudyMemo remembers your notes and mistakes, so every answer is
               consistent, source-cited, and truly yours.
             </p>
           </Reveal>
@@ -267,10 +267,10 @@ function Why() {
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal>
           <SectionHeading
-            eyebrow="Why Memoria"
+            eyebrow="Why StudyMemo"
             title={
               <>
-                What sets Memoria{" "}
+                What sets StudyMemo{" "}
                 <span className="text-primary italic">apart</span>
               </>
             }
@@ -417,7 +417,7 @@ function Showcase() {
     {
       eyebrow: "Revision Queue",
       title: "Practice the things you miss",
-      desc: "Memoria surfaces the mistakes you keep making and turns them into flashcards. Focused, not random.",
+      desc: "StudyMemo surfaces the mistakes you keep making and turns them into flashcards. Focused, not random.",
       icon: ListChecks,
       img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=1200&q=80",
     },
@@ -539,7 +539,7 @@ function StudentBenefits() {
   const benefits = [
     {
       title: "Save 15+ Hours a Week",
-      desc: "Stop re-reading the same textbook. Memoria directs you straight to the concepts you struggle with.",
+      desc: "Stop re-reading the same textbook. StudyMemo directs you straight to the concepts you struggle with.",
       icon: Zap,
       gradient: "from-blue-500/20 to-cyan-500/20",
       iconColor: "text-blue-500",
@@ -575,7 +575,7 @@ function StudentBenefits() {
         <Reveal>
           <SectionHeading
             eyebrow="Student Benefits"
-            title="How you benefit from using Memoria"
+            title="How you benefit from using StudyMemo"
             center
           />
         </Reveal>

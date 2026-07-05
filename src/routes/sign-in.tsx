@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { Button, MemoriaLogo } from "@/components/studymind/primitives";
+import { Button, StudyMemoLogo } from "@/components/studymind/primitives";
 
 export const Route = createFileRoute("/sign-in")({
   head: () => ({
     meta: [
-      { title: "Sign In — Memoria" },
-      { name: "description", content: "Sign back into Memoria." },
+      { title: "Sign In — StudyMemo" },
+      { name: "description", content: "Sign back into StudyMemo." },
     ],
   }),
   component: SignIn,
@@ -92,9 +92,9 @@ export function AuthShell({ title, sub, cta, alt, onSubmit, children }: any) {
         <div className="relative h-full flex flex-col justify-between p-12 text-white">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-full bg-white/10 backdrop-blur border border-white/20 grid place-items-center">
-              <MemoriaLogo className="w-5 h-5 text-white" />
+              <StudyMemoLogo className="w-5 h-5 text-white" />
             </div>
-            <span className="font-serif font-medium tracking-wide text-2xl">Memoria</span>
+            <span className="font-serif font-medium tracking-wide text-2xl">StudyMemo</span>
           </Link>
           <div>
             <h2 className="text-4xl xl:text-5xl font-serif font-medium leading-[1.1] tracking-wide mb-6">
@@ -106,7 +106,7 @@ export function AuthShell({ title, sub, cta, alt, onSubmit, children }: any) {
             </p>
           </div>
           <div className="text-[11px] uppercase tracking-widest text-white/40">
-            © 2026 Memoria Labs
+            © 2026 StudyMemo Labs
           </div>
         </div>
       </div>
@@ -114,9 +114,9 @@ export function AuthShell({ title, sub, cta, alt, onSubmit, children }: any) {
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-10 flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-primary grid place-items-center">
-              <MemoriaLogo className="w-4 h-4 text-white" />
+              <StudyMemoLogo className="w-4 h-4 text-white" />
             </div>
-            <span className="font-serif font-medium text-xl">Memoria</span>
+            <span className="font-serif font-medium text-xl">StudyMemo</span>
           </div>
           <h1 className="text-4xl font-serif font-medium tracking-wide mb-3 text-foreground">
             {title}
