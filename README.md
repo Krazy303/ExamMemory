@@ -194,4 +194,4 @@ The table below outlines the custom compilation behavior supported by our enhanc
 
 ## 📝 License
 
-Distributed under the MIT License. See [LICENSE](file:///d:/Projects/cognee%20hackathon/New%20folder/ExamMemory/LICENSE) for more information.
+Distributed under the GNU GPL License. See [LICENSE](file:///d:/Projects/cognee%20hackathon/New%20folder/ExamMemory/LICENSE) for more information.
